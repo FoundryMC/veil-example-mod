@@ -1,41 +1,32 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "veil-example-mod",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Veil Example Mod",
+	"description": "Example/Testing mod that uses Veil",
 	"authors": [
-		"Me!"
+		"Ocelot"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
+	"license": "MIT",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+			"foundry.veil.example.VeilExampleMod"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+			"foundry.veil.example.VeilExampleModClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
+		"veil-example-mod.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15.9",
-		"minecraft": "~1.20.4",
+		"minecraft": "~1.20.1",
+		"veil": ">=1.0.0",
 		"java": ">=17",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

@@ -1,8 +1,8 @@
-# Fabric Example Mod
+# Veil Example Mod
 
 ## Setup
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+For setup instructions, please see the [Veil wiki page](https://github.com/FoundryMC/Veil/wiki).
 
 ## License
 

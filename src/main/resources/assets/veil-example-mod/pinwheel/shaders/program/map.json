@@ -1,0 +1,20 @@
+{
+  "vertex": "veil-example-mod:map",
+  "tesselation_control": "veil-example-mod:map",
+  "tesselation_evaluation": "veil-example-mod:map",
+  "fragment": "veil-example-mod:map",
+  "definitions": [
+    {
+      "MIN_TESS_LEVEL": 4
+    },
+    {
+      "MAX_TESS_LEVEL": 64
+    },
+    {
+      "MIN_DISTANCE": 1
+    },
+    {
+      "MAX_DISTANCE": 6
+    }
+  ]
+}

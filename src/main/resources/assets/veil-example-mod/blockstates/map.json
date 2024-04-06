@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "veil-example-mod:block/map"
+    }
+  }
+}
