@@ -1,0 +1,48 @@
+layout (quads, fractional_odd_spacing, ccw) in;
+
+uniform mat4 ModelViewMat;
+uniform mat4 ProjMat;
+uniform sampler2D HeightMap;
+
+// received from Tessellation Control Shader - all texture coordinates for the patch vertices
+in float VertexDistance[];
+in vec4 VertexColor[];
+in vec4 LightMapColor[];
+in vec4 OverlayColor[];
+in vec2 TexCoord0[];
+
+out float vertexDistance;
+out vec4 vertexColor;
+out vec4 lightMapColor;
+out vec4 overlayColor;
+out vec2 texCoord0;
+
+void main()
+{
+    // get patch coordinate
+    float u0 = gl_TessCoord.x;
+    float u1 = 1.0 - gl_TessCoord.x;
+    float v = gl_TessCoord.y;
+
+    // ----------------------------------------------------------------------
+    // bilinearly interpolate texture coordinate across patch
+    vertexDistance = mix(mix(VertexDistance[0], VertexDistance[1], u0), mix(VertexDistance[2], VertexDistance[3], u1), v);
+    vertexColor = mix(mix(VertexColor[0], VertexColor[1], u0), mix(VertexColor[2], VertexColor[3], u1), v);
+    lightMapColor = mix(mix(LightMapColor[0], LightMapColor[1], u0), mix(LightMapColor[2], LightMapColor[3], u1), v);
+    overlayColor = mix(mix(OverlayColor[0], OverlayColor[1], u0), mix(OverlayColor[2], OverlayColor[3], u1), v);
+    texCoord0 = mix(mix(TexCoord0[0], TexCoord0[1], u0), mix(TexCoord0[2], TexCoord0[3], u1), v);
+
+    vec4 p = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, u0), mix(gl_in[2].gl_Position, gl_in[3].gl_Position, u1), v);
+
+    vec4 uVec = gl_in[1].gl_Position - gl_in[0].gl_Position;
+    vec4 vVec = gl_in[2].gl_Position - gl_in[0].gl_Position;
+    vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));
+
+    float distance = min(max(-(2.0 * u0 - 1.0) * (2.0 * u0 - 1.0) + 1.0, 0.0), max(-(2.0 * v - 1.0) * (2.0 * v - 1.0) + 1.0, 0.0));
+    float height = texture(HeightMap, gl_TessCoord.xy).g;
+    p -= normal * distance * 0.05 * height;
+
+    // ----------------------------------------------------------------------
+    // output patch point position in clip space
+    gl_Position = ProjMat * ModelViewMat * p;
+}

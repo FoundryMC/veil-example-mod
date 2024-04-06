@@ -1,0 +1,9 @@
+{
+  "vertex": "veil-example-mod:entity/rendertype_entity_cutout_no_cull",
+  "tesselation_control": "veil-example-mod:entity/rendertype_entity_cutout_no_cull",
+  "tesselation_evaluation": "veil-example-mod:entity/rendertype_entity_cutout_no_cull",
+  "fragment": "veil-example-mod:entity/rendertype_entity_cutout_no_cull",
+  "textures": {
+    "HeightMap": "veil-example-mod:textures/misc/heightmap.png"
+  }
+}
