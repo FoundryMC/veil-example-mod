@@ -45,7 +45,7 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         PoseStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushPose();
         modelViewStack.mulPoseMatrix(poseStack.last().pose());
-        modelViewStack.scale(25, 20, 25);
+//        modelViewStack.scale(25, 20, 25);
 
         this.vbo.bind();
         this.vbo.upload(render(20));
