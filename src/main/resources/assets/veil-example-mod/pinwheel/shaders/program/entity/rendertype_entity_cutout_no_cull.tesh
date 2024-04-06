@@ -1,8 +1,13 @@
+#include veil:light
+
 layout (quads, fractional_odd_spacing, ccw) in;
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform sampler2D HeightMap;
+
+uniform vec3 Light0_Direction;
+uniform vec3 Light1_Direction;
 
 // received from Tessellation Control Shader - all texture coordinates for the patch vertices
 in float VertexDistance[];
@@ -16,6 +21,19 @@ out vec4 vertexColor;
 out vec4 lightMapColor;
 out vec4 overlayColor;
 out vec2 texCoord0;
+
+float getOffset(float u, float v) {
+    float distance = min(max(-(2.0 * u - 1.0) * (2.0 * u - 1.0) + 1.0, 0.0), max(-(2.0 * v - 1.0) * (2.0 * v - 1.0) + 1.0, 0.0));
+    float height = texture(HeightMap, vec2(u, v)).g;
+    return distance * 0.05 * height;
+}
+
+vec4 getHeightMapPosition(vec4 normal, float u, float v) {
+    vec4 p = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, u), mix(gl_in[2].gl_Position, gl_in[3].gl_Position, 1.0 - u), v);
+    float offset = getOffset(u, v);
+    p += normal * offset;
+    return p;
+}
 
 void main()
 {
@@ -32,17 +50,20 @@ void main()
     overlayColor = mix(mix(OverlayColor[0], OverlayColor[1], u0), mix(OverlayColor[2], OverlayColor[3], u1), v);
     texCoord0 = mix(mix(TexCoord0[0], TexCoord0[1], u0), mix(TexCoord0[2], TexCoord0[3], u1), v);
 
-    vec4 p = mix(mix(gl_in[0].gl_Position, gl_in[1].gl_Position, u0), mix(gl_in[2].gl_Position, gl_in[3].gl_Position, u1), v);
-
     vec4 uVec = gl_in[1].gl_Position - gl_in[0].gl_Position;
     vec4 vVec = gl_in[2].gl_Position - gl_in[0].gl_Position;
-    vec4 normal = normalize(vec4(cross(vVec.xyz, uVec.xyz), 0));
+    vec4 realNormal = normalize(vec4(cross(uVec.xyz, vVec.xyz), 0));
 
-    float distance = min(max(-(2.0 * u0 - 1.0) * (2.0 * u0 - 1.0) + 1.0, 0.0), max(-(2.0 * v - 1.0) * (2.0 * v - 1.0) + 1.0, 0.0));
-    float height = texture(HeightMap, gl_TessCoord.xy).g;
-    p -= normal * distance * 0.05 * height;
+    vec4 pos = getHeightMapPosition(realNormal, u0, v);
+
+    vec4 normalUVec = getHeightMapPosition(realNormal, u0 - 0.01, v) - pos;
+    vec4 normalVVec = getHeightMapPosition(realNormal, u0, v - 0.01) - pos;
+    vec3 normal = normalize(cross(normalUVec.xyz, normalVVec.xyz));
+    normal = realNormal.xyz;
+
+    vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, normal, vertexColor);
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
-    gl_Position = ProjMat * ModelViewMat * p;
+    gl_Position = ProjMat * ModelViewMat * pos;
 }
