@@ -1,0 +1,7 @@
+{
+  "depth": true,
+  "width": 64,
+  "height": 64,
+  "format": "RGB8",
+  "autoClear": false
+}

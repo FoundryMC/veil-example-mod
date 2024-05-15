@@ -1,4 +1,5 @@
 {
   "veil-example-mod.items": "Veil Example",
-  "block.veil-example-mod.map": "Tesselation Map Example"
+  "block.veil-example-mod.map": "Tesselation Map Example",
+  "block.veil-example-mod.mirror": "Mirror Example"
 }

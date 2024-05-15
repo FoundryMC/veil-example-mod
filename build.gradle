@@ -10,6 +10,7 @@ base {
 }
 
 repositories {
+    mavenLocal()
 	maven {
 		name = 'BlameJared Maven (CrT / Bookshelf)'
 		url = 'https://maven.blamejared.com'
@@ -44,6 +45,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") { transitive = false }
+//    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:1.0.0") { transitive = false }
     modRuntimeOnly "maven.modrinth:modmenu:7.2.2"
 }
 

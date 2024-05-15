@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import foundry.veil.api.client.registry.RenderTypeStageRegistry;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.example.VeilExampleMod;
+import foundry.veil.example.client.render.MirrorBlockEntityRenderer;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -57,6 +58,18 @@ public final class VeilExampleRenderTypes extends RenderType {
         RenderTypeStageRegistry.addStage(rendertype, VeilRenderBridge.patchState(4));
         return rendertype;
     }));
+    private static final RenderType MIRROR = create(
+            "mirror",
+            DefaultVertexFormat.BLOCK,
+            VertexFormat.Mode.QUADS,
+            TRANSIENT_BUFFER_SIZE,
+            true,
+            false,
+            RenderType.CompositeState.builder()
+                    .setLightmapState(LIGHTMAP)
+                    .setShaderState(RENDERTYPE_SOLID_SHADER)
+                    .setLayeringState(POLYGON_OFFSET_LAYERING)
+                    .createCompositeState(true));
 
     static {
         RenderTypeStageRegistry.addStage(HEIGHTMAP_TESSELLATION, VeilRenderBridge.patchState(4));
@@ -68,6 +81,10 @@ public final class VeilExampleRenderTypes extends RenderType {
 
     public static RenderType cursedTessellationRenderTypeEntityCutoutNoCullWhyIsThisInAFundyVideoIBetHeWillProbablySayHeIsTheOneWhoCodedItInMinecraft(ResourceLocation texture, boolean outline) {
         return ENTITY_CUTOUT_NO_CULL.apply(texture, outline);
+    }
+
+    public static RenderType mirror() {
+        return MIRROR;
     }
 
     public static RenderType heightmap(boolean tessellation) {

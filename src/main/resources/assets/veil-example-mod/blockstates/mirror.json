@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "veil-example-mod:block/mirror",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "veil-example-mod:block/mirror",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "veil-example-mod:block/mirror"
+    },
+    "facing=west": {
+      "model": "veil-example-mod:block/mirror",
+      "y": 90
+    }
+  }
+}
