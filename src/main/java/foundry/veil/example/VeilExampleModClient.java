@@ -27,7 +27,7 @@ public class VeilExampleModClient implements ClientModInitializer {
 
         FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-                MirrorBlockEntityRenderer.renderLevel(Minecraft.getInstance().level, projectionMatrix, partialTicks, VeilRenderBridge.create(frustum));
+                MirrorBlockEntityRenderer.renderLevel(Minecraft.getInstance().level, bufferSource, poseStack, projectionMatrix, partialTicks, VeilRenderBridge.create(frustum), camera);
             }
         });
     }

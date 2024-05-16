@@ -2,6 +2,7 @@ package foundry.veil.example.client.render;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
@@ -16,8 +17,15 @@ import foundry.veil.example.block.MirrorBlock;
 import foundry.veil.example.blockentity.MirrorBlockEntity;
 import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.example.registry.VeilExampleRenderTypes;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectCollection;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -32,13 +40,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.NativeResource;
 
+import java.lang.Math;
 import java.nio.IntBuffer;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -55,38 +61,46 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
     private static final Matrix4f RENDER_PROJECTION = new Matrix4f();
 
     private static final ObjectSet<BlockPos> RENDER_POSITIONS = new ObjectArraySet<>();
-    private static final Object2ObjectMap<BlockPos, MirrorTexture> TEXTURES = new Object2ObjectArrayMap<>();
+    private static final Long2ObjectMap<MirrorTexture> TEXTURES = new Long2ObjectArrayMap<>();
 
     public MirrorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(this::free));
     }
 
+    private static long getKey(BlockPos pos, Direction face) {
+        Vec3i normal = face.getNormal();
+        return (long) face.getAxis().ordinal() << 60 | ((long) pos.getX() * normal.getX() + (long) pos.getY() * normal.getY() + (long) pos.getZ() * normal.getZ());
+    }
+
     @Override
     public void render(MirrorBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
         BlockPos pos = blockEntity.getBlockPos();
-        RENDER_POSITIONS.add(pos);
-        MirrorTexture texture = TEXTURES.get(pos);
+        Direction facing = blockEntity.getBlockState().getValue(MirrorBlock.FACING);
+
+        RENDER_POSITIONS.add(pos.immutable());
+        MirrorTexture texture = TEXTURES.get(getKey(pos, facing));
         if (texture == null) {
             return;
         }
 
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
-        Direction facing = blockEntity.getBlockState().getValue(MirrorBlock.FACING);
         poseStack.mulPose(Axis.YN.rotationDegrees(facing.toYRot()));
         poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
-        builder.vertex(pose, 0, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 1.0F).overlayCoords(j).uv2(i).normal(0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(pose, 1, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 1.0F).overlayCoords(j).uv2(i).normal(0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(pose, 1, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 0.0F).overlayCoords(j).uv2(i).normal(0.0F, 0.0F, 1.0F).endVertex();
-        builder.vertex(pose, 0, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 0.0F).overlayCoords(j).uv2(i).normal(0.0F, 0.0F, 1.0F).endVertex();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
+        builder.vertex(pose, 0, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 0.0F).uv2(i).endVertex();
+        builder.vertex(pose, 1, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 0.0F).uv2(i).endVertex();
+        builder.vertex(pose, 1, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 1.0F).uv2(i).endVertex();
+        builder.vertex(pose, 0, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 1.0F).uv2(i).endVertex();
 
+        RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1.0F);
         RenderSystem.setShaderTexture(0, texture.getId());
         VeilExampleRenderTypes.mirror().end(builder, RenderSystem.getVertexSorting());
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         poseStack.popPose();
     }
@@ -125,14 +139,14 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         return (float) ((pos.getX() + 0.5 - normal.getX() * 0.5 - x) * normal.getX() + (pos.getY() + 0.5 - normal.getY() * 0.5 - y) * normal.getY() + (pos.getZ() + 0.5 - normal.getZ() * 0.5 - z) * normal.getZ());
     }
 
-    public static void renderLevel(ClientLevel level, Matrix4fc projection, float partialTicks, CullFrustum frustum) {
+    public static void renderLevel(ClientLevel level, MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Matrix4fc projection, float partialTicks, CullFrustum frustum, Camera camera) {
         if (VeilLevelPerspectiveRenderer.isRenderingPerspective() || !projection.isFinite()) {
             return;
         }
 
         FramebufferManager framebufferManager = VeilRenderSystem.renderer().getFramebufferManager();
-        AdvancedFbo baseFbo = framebufferManager.getFramebuffer(MIRROR_FBOS[0]);
-        if (baseFbo == null) {
+        AdvancedFbo fbo = framebufferManager.getFramebuffer(MIRROR_FBOS[0]);
+        if (fbo == null) {
             return;
         }
 
@@ -143,30 +157,65 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
             }
 
             Direction facing = state.getValue(MirrorBlock.FACING);
-            Vec3i normal = facing.getNormal();
-            Vector3dc cameraPos = frustum.getPosition();
-            int lod = Mth.clamp(0, (int) (cameraPos.distanceSquared(pos.getX(), pos.getY(), pos.getZ()) / 64.0), MIRROR_FBOS.length - 1);
-            AdvancedFbo fbo = framebufferManager.getFramebuffer(MIRROR_FBOS[lod]);
-            if (fbo == null) {
-                fbo = baseFbo;
+            MirrorTexture mirror = TEXTURES.computeIfAbsent(getKey(pos, facing), unused -> new MirrorTexture());
+            mirror.positions.add(pos);
+            if (mirror.hasRendered()) {
+                continue;
             }
 
-            MirrorTexture mirror = TEXTURES.computeIfAbsent(pos, unused -> new MirrorTexture());
-            Vector3d renderPos = new Vector3d(pos.getX() + 0.5 - normal.getX() * 0.5, pos.getY() + 0.5 - normal.getY() * 0.5, pos.getZ() + 0.5 - normal.getZ() * 0.5);
-            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION.setPerspective(30, (float) fbo.getWidth() / fbo.getHeight(), 0.3F, RENDER_DISTANCE * 4.0F), renderPos, Axis.YN.rotationDegrees(180 - facing.toYRot()), RENDER_DISTANCE, partialTicks);
+            Vec3i normal = facing.getNormal();
+            Vector3dc cameraPos = frustum.getPosition();
+
+            Vector3d renderPos = new Vector3d(pos.getX() + 0.5 - normal.getX() * 0.375, pos.getY() + 0.5 - normal.getY() * 0.375, pos.getZ() + 0.5 - normal.getZ() * 0.375);
+
+            Vector3f offset = new Vector3f((float) (cameraPos.x() - renderPos.x), (float) (cameraPos.y() - renderPos.y), (float) (cameraPos.z() - renderPos.z));
+            offset.reflect(normal.getX(), normal.getY(), normal.getZ());
+            renderPos.add(offset);
+
+            Vector3f dir = camera.getLookVector().reflect(normal.getX(), normal.getY(), normal.getZ(), new Vector3f());
+            Vector3f up = camera.getUpVector().reflect(normal.getX(), normal.getY(), normal.getZ(), new Vector3f());
+
+            Window window = Minecraft.getInstance().getWindow();
+            float aspect = (float) window.getWidth() / window.getHeight();
+            float fov = projection.perspectiveFov();
+            RENDER_PROJECTION.setPerspective(fov, aspect, 0.3F, 1000.0F);
+
+//            Vector4f clipPlaneCameraSpace =
+//                    Matrix4x4.Transpose(Matrix4x4.Inverse(portalCamera.worldToCameraMatrix)) * clipPlane;
+
+//            poseStack.pushPose();
+//            poseStack.translate(renderPos.x - cameraPos.x(), renderPos.y - cameraPos.y(), renderPos.z - cameraPos.z());
+//            DebugFrustumRenderer.renderFrustum(bufferSource, poseStack, RENDER_MODELVIEW.identity().rotate(new Quaternionf().lookAlong(dir, up)), RENDER_PROJECTION, 1, 1, 1, 1);
+//            bufferSource.endLastBatch();
+
+            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW.identity(), RENDER_PROJECTION, renderPos, new Quaternionf().lookAlong(dir, up), RENDER_DISTANCE, partialTicks);
             mirror.copy(fbo);
+            mirror.setRendered(true);
         }
 
-        ObjectIterator<Map.Entry<BlockPos, MirrorTexture>> iterator = TEXTURES.entrySet().iterator();
+        ObjectIterator<Long2ObjectMap.Entry<MirrorTexture>> iterator = TEXTURES.long2ObjectEntrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<BlockPos, MirrorTexture> entry = iterator.next();
-            if (!RENDER_POSITIONS.contains(entry.getKey())) {
+            Map.Entry<Long, MirrorTexture> entry = iterator.next();
+            MirrorTexture mirror = entry.getValue();
+            mirror.setRendered(false);
+            mirror.positions.removeIf(p -> !RENDER_POSITIONS.contains(p));
+            if (mirror.positions.isEmpty()) {
                 iterator.remove();
-                entry.getValue().close();
+                mirror.close();
             }
         }
 
         RENDER_POSITIONS.clear();
+    }
+
+    public static void CalculateObliqueMatrix(Matrix4f projection, Vector4fc clipPlane) {
+        Vector4f q = projection.invert(new Matrix4f()).transform(new Vector4f(
+                Math.signum(clipPlane.x()),
+                Math.signum(clipPlane.y()),
+                1.0f,
+                1.0f));
+        Vector4f c = clipPlane.mul(2.0F / (clipPlane.dot(q)), new Vector4f());
+        projection.m02(c.x - projection.m03()).m12(c.y - projection.m13()).m22(c.z - projection.m23()).m32(c.w - projection.m33());
     }
 
     @Override
@@ -183,10 +232,14 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
     private static class MirrorTexture extends AbstractTexture {
 
+        private final ObjectSet<BlockPos> positions;
+        private boolean rendered;
+
         private int width;
         private int height;
 
         private MirrorTexture() {
+            this.positions = new ObjectArraySet<>();
             this.setFilter(false, true);
             this.width = -1;
             this.height = -1;
@@ -211,6 +264,14 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
             glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
             AdvancedFbo.unbind();
             glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
+        public boolean hasRendered() {
+            return this.rendered;
+        }
+
+        public void setRendered(boolean rendered) {
+            this.rendered = rendered;
         }
     }
 }
