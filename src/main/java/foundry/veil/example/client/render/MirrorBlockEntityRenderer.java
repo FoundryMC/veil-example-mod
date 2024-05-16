@@ -54,7 +54,7 @@ import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBlockEntity>, NativeResource {
 
-    private static final ResourceLocation[] MIRROR_FBOS = IntStream.range(0, 4).mapToObj(i -> VeilExampleMod.path("mirror" + i)).toArray(ResourceLocation[]::new);
+    private static final ResourceLocation MIRROR_FBO = VeilExampleMod.path("mirror");
     private static final float RENDER_DISTANCE = 64.0F;
 
     private static final Matrix4f RENDER_MODELVIEW = new Matrix4f();
@@ -145,7 +145,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         }
 
         FramebufferManager framebufferManager = VeilRenderSystem.renderer().getFramebufferManager();
-        AdvancedFbo fbo = framebufferManager.getFramebuffer(MIRROR_FBOS[0]);
+        AdvancedFbo fbo = framebufferManager.getFramebuffer(MIRROR_FBO);
         if (fbo == null) {
             return;
         }
@@ -167,26 +167,23 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
             Vector3dc cameraPos = frustum.getPosition();
 
             Vector3d renderPos = new Vector3d(pos.getX() + 0.5 - normal.getX() * 0.375, pos.getY() + 0.5 - normal.getY() * 0.375, pos.getZ() + 0.5 - normal.getZ() * 0.375);
-
             Vector3f offset = new Vector3f((float) (cameraPos.x() - renderPos.x), (float) (cameraPos.y() - renderPos.y), (float) (cameraPos.z() - renderPos.z));
+            Vector4f plane = new Vector4f(normal.getX(), normal.getY(), normal.getZ(), -offset.dot(normal.getX(), normal.getY(), normal.getZ()));
+
+            Window window = Minecraft.getInstance().getWindow();
+            float aspect = (float) window.getWidth() / window.getHeight();
+            float fov = projection.perspectiveFov();
+            RENDER_PROJECTION.setPerspective(fov, aspect, 0.3F, RENDER_DISTANCE * 4);
+
             offset.reflect(normal.getX(), normal.getY(), normal.getZ());
             renderPos.add(offset);
 
             Vector3f dir = camera.getLookVector().reflect(normal.getX(), normal.getY(), normal.getZ(), new Vector3f());
             Vector3f up = camera.getUpVector().reflect(normal.getX(), normal.getY(), normal.getZ(), new Vector3f());
 
-            Window window = Minecraft.getInstance().getWindow();
-            float aspect = (float) window.getWidth() / window.getHeight();
-            float fov = projection.perspectiveFov();
-            RENDER_PROJECTION.setPerspective(fov, aspect, 0.3F, 1000.0F);
+            new Quaternionf().lookAlong(dir, up).transform(plane);
 
-//            Vector4f clipPlaneCameraSpace =
-//                    Matrix4x4.Transpose(Matrix4x4.Inverse(portalCamera.worldToCameraMatrix)) * clipPlane;
-
-//            poseStack.pushPose();
-//            poseStack.translate(renderPos.x - cameraPos.x(), renderPos.y - cameraPos.y(), renderPos.z - cameraPos.z());
-//            DebugFrustumRenderer.renderFrustum(bufferSource, poseStack, RENDER_MODELVIEW.identity().rotate(new Quaternionf().lookAlong(dir, up)), RENDER_PROJECTION, 1, 1, 1, 1);
-//            bufferSource.endLastBatch();
+            CalculateObliqueMatrix(RENDER_PROJECTION, plane);
 
             VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW.identity(), RENDER_PROJECTION, renderPos, new Quaternionf().lookAlong(dir, up), RENDER_DISTANCE, partialTicks);
             mirror.copy(fbo);
