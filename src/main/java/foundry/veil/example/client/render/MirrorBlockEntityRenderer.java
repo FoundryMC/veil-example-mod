@@ -36,7 +36,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +46,6 @@ import org.lwjgl.system.NativeResource;
 import java.lang.Math;
 import java.nio.IntBuffer;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
@@ -59,6 +57,8 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
     private static final Matrix4f RENDER_MODELVIEW = new Matrix4f();
     private static final Matrix4f RENDER_PROJECTION = new Matrix4f();
+    private static final Vector4f OBLIQUE_PLANE = new Vector4f();
+    private static final Quaternionf VIEW = new Quaternionf();
 
     private static final ObjectSet<BlockPos> RENDER_POSITIONS = new ObjectArraySet<>();
     private static final Long2ObjectMap<MirrorTexture> TEXTURES = new Long2ObjectArrayMap<>();
@@ -74,6 +74,10 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
     @Override
     public void render(MirrorBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
+        if (VeilLevelPerspectiveRenderer.isRenderingPerspective()) {
+            return;
+        }
+
         BlockPos pos = blockEntity.getBlockPos();
         Direction facing = blockEntity.getBlockState().getValue(MirrorBlock.FACING);
 
@@ -139,7 +143,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         return (float) ((pos.getX() + 0.5 - normal.getX() * 0.5 - x) * normal.getX() + (pos.getY() + 0.5 - normal.getY() * 0.5 - y) * normal.getY() + (pos.getZ() + 0.5 - normal.getZ() * 0.5 - z) * normal.getZ());
     }
 
-    public static void renderLevel(ClientLevel level, MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Matrix4fc projection, float partialTicks, CullFrustum frustum, Camera camera) {
+    public static void renderLevel(ClientLevel level, Matrix4fc projection, float partialTicks, CullFrustum frustum, Camera camera) {
         if (VeilLevelPerspectiveRenderer.isRenderingPerspective() || !projection.isFinite()) {
             return;
         }
@@ -183,9 +187,9 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
             new Quaternionf().lookAlong(dir, up).transform(plane);
 
-            CalculateObliqueMatrix(RENDER_PROJECTION, plane);
+            calculateObliqueMatrix(RENDER_PROJECTION, plane, RENDER_PROJECTION);
 
-            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW.identity(), RENDER_PROJECTION, renderPos, new Quaternionf().lookAlong(dir, up), RENDER_DISTANCE, partialTicks);
+            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION, renderPos, VIEW.lookAlong(dir, up), RENDER_DISTANCE, partialTicks);
             mirror.copy(fbo);
             mirror.setRendered(true);
         }
@@ -205,14 +209,15 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         RENDER_POSITIONS.clear();
     }
 
-    public static void CalculateObliqueMatrix(Matrix4f projection, Vector4fc clipPlane) {
-        Vector4f q = projection.invert(new Matrix4f()).transform(new Vector4f(
-                Math.signum(clipPlane.x()),
-                Math.signum(clipPlane.y()),
+    public static void calculateObliqueMatrix(Matrix4fc projection, Vector4fc c, Matrix4f store) {
+        Vector4f q = projection.invert(new Matrix4f()).transform(
+                Math.signum(c.x()),
+                Math.signum(c.y()),
                 1.0f,
-                1.0f));
-        Vector4f c = clipPlane.mul(2.0F / (clipPlane.dot(q)), new Vector4f());
-        projection.m02(c.x - projection.m03()).m12(c.y - projection.m13()).m22(c.z - projection.m23()).m32(c.w - projection.m33());
+                1.0f,
+                OBLIQUE_PLANE);
+        float dot = c.dot(q);
+        store.m02(c.x() * 2.0F / dot - projection.m03()).m12(c.y() * 2.0F / dot - projection.m13()).m22(c.z() * 2.0F / dot - projection.m23()).m32(c.w() * 2.0F / dot - projection.m33());
     }
 
     @Override
