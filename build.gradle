@@ -47,6 +47,8 @@ dependencies {
     modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") { transitive = false }
 //    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:1.0.0") { transitive = false }
     modRuntimeOnly "maven.modrinth:modmenu:7.2.2"
+
+    modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
 }
 
 processResources {
