@@ -7,14 +7,12 @@ import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.example.blockentity.MapBlockEntity;
 import foundry.veil.example.editor.VeilExampleModEditor;
 import foundry.veil.example.registry.VeilExampleRenderTypes;
-import imgui.ImGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL13C;
 import org.lwjgl.opengl.GL32C;
 
 import static org.lwjgl.opengl.GL11C.*;

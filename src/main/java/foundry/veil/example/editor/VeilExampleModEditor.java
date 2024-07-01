@@ -5,9 +5,12 @@ import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.definition.ShaderPreDefinitions;
 import imgui.ImGui;
 import imgui.type.ImBoolean;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class VeilExampleModEditor extends SingleWindowEditor {
+
+    public static final Component TITLE = Component.translatable("editor.veil-example-mod.editor.title");
 
     private static final int[] minTessLevel = new int[]{4};
     private static final int[] maxTessLevel = new int[]{64};
@@ -43,7 +46,7 @@ public class VeilExampleModEditor extends SingleWindowEditor {
                 }
                 ImGui.endTabItem();
 
-                if (ImGui.isItemHovered()) {
+                if (value.tooltip != null && ImGui.isItemHovered()) {
                     ImGui.beginTooltip();
                     ImGui.pushTextWrapPos(ImGui.getFontSize() * 35.0f);
                     ImGui.textUnformatted(value.tooltip);
@@ -57,8 +60,8 @@ public class VeilExampleModEditor extends SingleWindowEditor {
     }
 
     @Override
-    public String getDisplayName() {
-        return "Veil Example Mod";
+    public Component getDisplayName() {
+        return TITLE;
     }
 
     public static boolean useTessellation() {

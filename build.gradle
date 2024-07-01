@@ -11,21 +11,21 @@ base {
 
 repositories {
     mavenLocal()
-	maven {
-		name = 'BlameJared Maven (CrT / Bookshelf)'
-		url = 'https://maven.blamejared.com'
-	}
-	exclusiveContent {
-		forRepository {
-			maven {
-				name = "Modrinth"
-				url = "https://api.modrinth.com/maven"
-			}
-		}
-		filter {
-			includeGroup "maven.modrinth"
-		}
-	}
+    maven {
+        name = 'BlameJared Maven (CrT / Bookshelf)'
+        url = 'https://maven.blamejared.com'
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 loom {
@@ -44,11 +44,12 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") { transitive = false }
-//    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:1.0.0") { transitive = false }
+    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
+        exclude group: "maven.modrinth"
+    }
     modRuntimeOnly "maven.modrinth:modmenu:7.2.2"
 
-    modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
+//    modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
 }
 
 processResources {
