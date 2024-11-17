@@ -1,5 +1,6 @@
 package foundry.veil.example;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.framebuffer.AdvancedFboAttachment;
@@ -18,6 +19,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+
+import java.util.Random;
 
 public class VeilExampleModClient implements ClientModInitializer {
 
@@ -49,14 +53,29 @@ public class VeilExampleModClient implements ClientModInitializer {
 
         // Make sure there's no crash
         FabricVeilRendererEvent.EVENT.register(renderer -> {
-            try (DynamicCubemapTexture cubemap = new DynamicCubemapTexture()) {
-                cubemap.init(64, 64);
-                AdvancedFbo fbo = AdvancedFbo.withSize(64, 64).addColorTextureWrapper(cubemap.getId(), 0).build(true);
-                fbo.bind(false);
-                fbo.setColorAttachmentTexture(0, cubemap.getId(), 1);
-                AdvancedFbo.unbind();
-                fbo.free();
+            DynamicCubemapTexture cubemap = new DynamicCubemapTexture();
+            for (Direction value : Direction.values()) {
+                try (NativeImage image = genTest(64, 64)) {
+                    cubemap.upload(value, image);
+                }
             }
+            AdvancedFbo fbo = AdvancedFbo.withSize(64, 64).addColorTextureWrapper(cubemap.getId(), 0).build(true);
+            fbo.bind(false);
+            fbo.setColorAttachmentTexture(0, cubemap.getId(), 1);
+            AdvancedFbo.unbind();
         });
+    }
+
+    private static NativeImage genTest(int width, int height) {
+        NativeImage nativeImage = new NativeImage(width, height, false);
+
+        Random random = new Random();
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                nativeImage.setPixelRGBA(x, y, 0xFF000000 | random.nextInt(0xFFFFFF));
+            }
+        }
+
+        return nativeImage;
     }
 }
