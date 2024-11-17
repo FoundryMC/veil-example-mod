@@ -38,19 +38,6 @@ public class VeilExampleModClient implements ClientModInitializer {
             }
         });
 
-        FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum) -> {
-            if(stage != VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-                try (DynamicCubemapTexture cubemap = new DynamicCubemapTexture()) {
-                    cubemap.init(64, 64);
-                    AdvancedFbo fbo = AdvancedFbo.withSize(64, 64).addColorTextureWrapper(cubemap.getId(), 0).build(true);
-                    fbo.bind(false);
-                    fbo.setColorAttachmentTexture(0, cubemap.getId(), 1);
-                    AdvancedFbo.unbind();
-                    fbo.free();
-                }
-            }
-        });
-
         // Make sure there's no crash
         FabricVeilRendererEvent.EVENT.register(renderer -> {
             DynamicCubemapTexture cubemap = new DynamicCubemapTexture();
