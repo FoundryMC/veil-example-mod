@@ -29,6 +29,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -88,6 +89,11 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
             return;
         }
 
+        RenderType renderType = VeilExampleRenderTypes.mirror();
+        if (renderType == null) {
+            return;
+        }
+
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         poseStack.mulPose(Axis.YN.rotationDegrees(facing.toYRot()));
@@ -102,7 +108,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
         RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1.0F);
         RenderSystem.setShaderTexture(0, texture.getId());
-        VeilExampleRenderTypes.mirror().draw(builder.buildOrThrow());
+        renderType.draw(builder.buildOrThrow());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         poseStack.popPose();

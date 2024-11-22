@@ -33,6 +33,9 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
     @Override
     public void render(MapBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource source, int light, int overlay) {
         RenderType renderType = VeilExampleRenderTypes.heightmap(VeilExampleModEditor.useTessellation());
+        if (renderType == null) {
+            return;
+        }
 
         renderType.setupRenderState();
         ShaderProgram shader = VeilRenderSystem.getShader();

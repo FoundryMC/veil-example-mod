@@ -10,6 +10,7 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
@@ -49,11 +50,11 @@ public final class VeilExampleRenderTypes extends RenderType {
         return ENTITY_CUTOUT_NO_CULL.apply(texture, outline);
     }
 
-    public static RenderType mirror() {
+    public static @Nullable RenderType mirror() {
         return VeilRenderType.get(MIRROR);
     }
 
-    public static RenderType heightmap(boolean tessellation) {
+    public static @Nullable RenderType heightmap(boolean tessellation) {
         return VeilRenderType.get(tessellation ? HEIGHTMAP_TESSELLATION : HEIGHTMAP_TEXTURE);
     }
 }
