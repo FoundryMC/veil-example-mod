@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL32C;
 
@@ -40,16 +41,16 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
             return;
         }
 
-        PoseStack modelViewStack = RenderSystem.getModelViewStack();
-        modelViewStack.pushPose();
-        modelViewStack.mulPoseMatrix(poseStack.last().pose());
+        Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
+        modelViewStack.pushMatrix();
+        modelViewStack.mul(poseStack.last().pose());
 //        modelViewStack.scale(25, 20, 25);
 
         this.vbo.bind();
         this.vbo.upload(render(20));
 
         shader.applyRenderSystem();
-        shader.setMatrix("ModelViewMat", modelViewStack.last().pose());
+        shader.setMatrix("ModelViewMat", modelViewStack);
         shader.setup();
         if (VeilExampleModEditor.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL11C.GL_LINE);
@@ -66,34 +67,29 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
 
         VertexBuffer.unbind();
 
-        modelViewStack.popPose();
+        modelViewStack.popMatrix();
     }
 
-    private static BufferBuilder.RenderedBuffer render(int resolution) {
+    private static MeshData render(int resolution) {
         Tesselator tesselator = RenderSystem.renderThreadTesselator();
-        BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
         for (int z = 0; z <= resolution - 1; z++) {
             for (int x = 0; x <= resolution - 1; x++) {
-                builder.vertex(x / (float) resolution, 0, z / (float) resolution)
-                        .uv(x / (float) resolution, z / (float) resolution)
-                        .endVertex();
+                builder.addVertex(x / (float) resolution, 0, z / (float) resolution)
+                        .setUv(x / (float) resolution, z / (float) resolution);
 
-                builder.vertex((x + 1) / (float) resolution, 0, z / (float) resolution)
-                        .uv((x + 1) / (float) resolution, z / (float) resolution)
-                        .endVertex();
+                builder.addVertex((x + 1) / (float) resolution, 0, z / (float) resolution)
+                        .setUv((x + 1) / (float) resolution, z / (float) resolution);
 
-                builder.vertex(x / (float) resolution, 0, (z + 1) / (float) resolution)
-                        .uv(x / (float) resolution, (z + 1) / (float) resolution)
-                        .endVertex();
+                builder.addVertex(x / (float) resolution, 0, (z + 1) / (float) resolution)
+                        .setUv(x / (float) resolution, (z + 1) / (float) resolution);
 
-                builder.vertex((x + 1) / (float) resolution, 0, (z + 1) / (float) resolution)
-                        .uv((x + 1) / (float) resolution, (z + 1) / (float) resolution)
-                        .endVertex();
+                builder.addVertex((x + 1) / (float) resolution, 0, (z + 1) / (float) resolution)
+                        .setUv((x + 1) / (float) resolution, (z + 1) / (float) resolution);
             }
         }
 
-        return builder.end();
+        return builder.buildOrThrow();
     }
 }

@@ -1,0 +1,70 @@
+{
+  "format": "POSITION",
+  "mode": "QUADS",
+  "bufferSize": "TRANSIENT",
+  "sort": false,
+  "affectsCrumbling": true,
+  "outline": false,
+  "layers": [
+    {
+      "type": "minecraft:texture",
+      "texture": "%1$s",
+      "blur": false,
+      "mipmap": false
+    },
+    {
+      "type": "minecraft:shader",
+      "name": "rendertype_lightning"
+    },
+    {
+      "type": "veil:shader",
+      "name": "veil:blit_screen"
+    },
+    {
+      "type": "minecraft:transparency",
+      "mode": "translucent"
+    },
+    {
+      "type": "minecraft:depth_test",
+      "mode": "gequal"
+    },
+    {
+      "type": "minecraft:cull"
+    },
+    {
+      "type": "minecraft:lightmap"
+    },
+    {
+      "type": "minecraft:overlay"
+    },
+    {
+      "type": "minecraft:layering",
+      "mode": "polygon_offset"
+    },
+    {
+      "type": "minecraft:output",
+      "framebuffer": "minecraft:clouds"
+    },
+    {
+      "type": "minecraft:texturing",
+      "scale": 4.0
+    },
+    {
+      "type": "minecraft:write_mask",
+      "color": true,
+      "depth": false
+    },
+    {
+      "type": "minecraft:line",
+      "width": 42
+    },
+    {
+      "type": "minecraft:color_logic",
+      "operation": "xor"
+    },
+    {
+      "type": "veil:patches",
+      "patchVertices": 8
+    }
+  ]
+}

@@ -1,9 +1,11 @@
 package foundry.veil.example;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.framebuffer.AdvancedFboAttachment;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.api.client.render.texture.DynamicCubemapTexture;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.example.blockentity.MapBlockEntity;
@@ -15,11 +17,14 @@ import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.fabric.event.FabricVeilRenderLevelStageEvent;
 import foundry.veil.fabric.event.FabricVeilRendererEvent;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Random;
 
@@ -32,9 +37,9 @@ public class VeilExampleModClient implements ClientModInitializer {
         BlockEntityRenderers.register(VeilExampleBlocks.MIRROR_BE, MirrorBlockEntityRenderer::new);
         FabricVeilRendererEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModEditor()));
 
-        FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum) -> {
+        FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
-                MirrorBlockEntityRenderer.renderLevel(Minecraft.getInstance().level, projectionMatrix, partialTicks, VeilRenderBridge.create(frustum), camera);
+                MirrorBlockEntityRenderer.renderLevel(Minecraft.getInstance().level, projectionMatrix, deltaTracker, VeilRenderBridge.create(frustum), camera);
             }
         });
 
@@ -50,6 +55,12 @@ public class VeilExampleModClient implements ClientModInitializer {
             fbo.bind(false);
             fbo.setColorAttachmentTexture(0, cubemap.getId(), 1);
             AdvancedFbo.unbind();
+        });
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (GLFW.glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
+                RenderType test = VeilRenderType.get(VeilExampleMod.path("test"), "test.png");
+                System.out.println(test);
+            }
         });
     }
 

@@ -1,0 +1,27 @@
+{
+  "format": "POSITION_TEX",
+  "mode": "QUADS",
+  "bufferSize": "TRANSIENT",
+  "sort": false,
+  "affectsCrumbling": true,
+  "outline": false,
+  "layers": [
+    {
+      "type": "minecraft:texture",
+      "texture": "veil-example-mod:textures/misc/heightmap.png",
+      "blur": true,
+      "mipmap": false
+    },
+    {
+      "type": "veil:shader",
+      "name": "veil-example-mod:map"
+    },
+    {
+      "type": "minecraft:lightmap"
+    },
+    {
+      "type": "veil:patches",
+      "patchVertices": 4
+    }
+  ]
+}

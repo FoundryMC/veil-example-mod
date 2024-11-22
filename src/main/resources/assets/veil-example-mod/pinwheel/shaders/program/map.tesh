@@ -1,8 +1,7 @@
-#include veil:camera
-
 layout (quads, fractional_odd_spacing, cw) in;
 
 uniform mat4 ModelViewMat;
+uniform mat4 RenderProjMat;
 
 uniform sampler2D Sampler0;
 
@@ -54,5 +53,5 @@ void main()
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
-    gl_Position = VeilCamera.ProjMat * ModelViewMat * p;
+    gl_Position = RenderProjMat * ModelViewMat * p;
 }

@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -93,17 +94,15 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
-        builder.vertex(pose, 0, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 0.0F).uv2(i).endVertex();
-        builder.vertex(pose, 1, 0, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 0.0F).uv2(i).endVertex();
-        builder.vertex(pose, 1, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(0.0F, 1.0F).uv2(i).endVertex();
-        builder.vertex(pose, 0, 1, 0.125F).color(1.0F, 1.0F, 1.0F, 1.0F).uv(1.0F, 1.0F).uv2(i).endVertex();
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
+        builder.addVertex(pose, 0, 0, 0.125F).setColor(1.0F, 1.0F, 1.0F, 1.0F).setUv(1.0F, 0.0F).setLight(i);
+        builder.addVertex(pose, 1, 0, 0.125F).setColor(1.0F, 1.0F, 1.0F, 1.0F).setUv(0.0F, 0.0F).setLight(i);
+        builder.addVertex(pose, 1, 1, 0.125F).setColor(1.0F, 1.0F, 1.0F, 1.0F).setUv(0.0F, 1.0F).setLight(i);
+        builder.addVertex(pose, 0, 1, 0.125F).setColor(1.0F, 1.0F, 1.0F, 1.0F).setUv(1.0F, 1.0F).setLight(i);
 
         RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1.0F);
         RenderSystem.setShaderTexture(0, texture.getId());
-        VeilExampleRenderTypes.mirror().end(builder, RenderSystem.getVertexSorting());
+        VeilExampleRenderTypes.mirror().draw(builder.buildOrThrow());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         poseStack.popPose();
@@ -143,7 +142,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         return (float) ((pos.getX() + 0.5 - normal.getX() * 0.5 - x) * normal.getX() + (pos.getY() + 0.5 - normal.getY() * 0.5 - y) * normal.getY() + (pos.getZ() + 0.5 - normal.getZ() * 0.5 - z) * normal.getZ());
     }
 
-    public static void renderLevel(ClientLevel level, Matrix4fc projection, float partialTicks, CullFrustum frustum, Camera camera) {
+    public static void renderLevel(ClientLevel level, Matrix4fc projection, DeltaTracker deltaTracker, CullFrustum frustum, Camera camera) {
         if (VeilLevelPerspectiveRenderer.isRenderingPerspective() || !projection.isFinite()) {
             return;
         }
@@ -189,7 +188,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
             calculateObliqueMatrix(RENDER_PROJECTION, plane, RENDER_PROJECTION);
 
-            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION, renderPos, VIEW.identity().lookAlong(dir, up), RENDER_DISTANCE, partialTicks);
+            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION, renderPos, VIEW.identity().lookAlong(dir, up), RENDER_DISTANCE, deltaTracker);
             mirror.copy(fbo);
             mirror.setRendered(true);
         }

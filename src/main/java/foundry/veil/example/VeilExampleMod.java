@@ -23,7 +23,7 @@ public class VeilExampleMod implements ModInitializer {
     private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, VeilExampleMod.path("items"));
 
     public static ResourceLocation path(String path) {
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     @Override

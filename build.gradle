@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
 }
 
 version = project.mod_version
@@ -44,10 +44,10 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
+    modImplementation("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}") {
         exclude group: "maven.modrinth"
     }
-    modRuntimeOnly "maven.modrinth:modmenu:7.2.2"
+    modRuntimeOnly "maven.modrinth:modmenu:11.0.3"
 
 //    modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
 }

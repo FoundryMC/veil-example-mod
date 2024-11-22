@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class VeilExampleBlocks {
 
-    public static final Block MAP = register("map", new MapBlock(BlockBehaviour.Properties.copy(Blocks.BEDROCK)
+    public static final Block MAP = register("map", new MapBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)
                     .noOcclusion()
                     .isRedstoneConductor(Blocks::never)
                     .isSuffocating(Blocks::never)),
             new Item.Properties());
-    public static final Block MIRROR = register("mirror", new MirrorBlock(BlockBehaviour.Properties.copy(Blocks.BEDROCK)
+    public static final Block MIRROR = register("mirror", new MirrorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)
                     .noOcclusion()
                     .isRedstoneConductor(Blocks::never)
                     .isSuffocating(Blocks::never)),
