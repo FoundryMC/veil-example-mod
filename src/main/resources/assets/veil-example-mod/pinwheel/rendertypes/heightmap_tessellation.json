@@ -20,6 +20,9 @@
       "type": "minecraft:lightmap"
     },
     {
+      "type": "minecraft:layering"
+    },
+    {
       "type": "veil:patches",
       "patchVertices": 4
     }
