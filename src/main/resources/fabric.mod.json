@@ -1,32 +1,34 @@
 {
-	"schemaVersion": 1,
-	"id": "veil-example-mod",
-	"version": "${version}",
-	"name": "Veil Example Mod",
-	"description": "Example/Testing mod that uses Veil",
-	"authors": [
-		"Ocelot"
-	],
-	"contact": {
-	},
-	"license": "MIT",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"foundry.veil.example.VeilExampleMod"
-		],
-		"client": [
-			"foundry.veil.example.VeilExampleModClient"
-		]
-	},
-	"mixins": [
-		"veil-example-mod.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.15.9",
-		"minecraft": "~1.21",
-		"veil": ">=1.0.0",
-		"java": ">=21",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "veil-example-mod",
+  "version": "${version}",
+  "name": "Veil Example Mod",
+  "description": "Example/Testing mod that uses Veil",
+  "authors": [
+    "Ocelot"
+  ],
+  "contact": {
+    "issues": "https://github.com/FoundryMC/veil-example-mod/issues",
+    "sources": "https://github.com/FoundryMC/veil-example-mod"
+  },
+  "license": "CC0-1.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "foundry.veil.example.VeilExampleMod"
+    ],
+    "client": [
+      "foundry.veil.example.VeilExampleModClient"
+    ]
+  },
+  "mixins": [
+    "veil-example-mod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.9",
+    "minecraft": "~1.21",
+    "veil": ">=1.0.0",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }
