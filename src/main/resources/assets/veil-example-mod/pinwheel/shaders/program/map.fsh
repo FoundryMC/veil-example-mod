@@ -1,10 +1,17 @@
 uniform sampler2D Sampler0;
 uniform vec4 ColorModulator;
 
-in vec2 fragTexCoord;
+in vec2 texCoord;
+in vec3 normal;
 
 out vec4 OutColor;
 
 void main() {
-    OutColor = texture(Sampler0, fragTexCoord) * ColorModulator;
+    vec4 color = texture(Sampler0, texCoord);
+    if (color.a < 0.1) {
+        discard;
+    }
+
+    color.rgb *= max(dot(normal, vec3(0.0, 0.0, 1.0)), 0.2);
+    OutColor = color * ColorModulator;
 }

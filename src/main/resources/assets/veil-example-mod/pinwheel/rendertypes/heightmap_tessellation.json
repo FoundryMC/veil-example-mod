@@ -27,6 +27,10 @@
       "type": "minecraft:layering"
     },
     {
+      "type": "minecraft:cull",
+      "face": "none"
+    },
+    {
       "type": "veil:patches",
       "patchVertices": 4
     }

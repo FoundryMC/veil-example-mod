@@ -5,12 +5,15 @@ layout (vertices=4) out;
 uniform mat4 ModelViewMat;
 
 in vec2 texCoord[];
+in vec3 normal[];
 
 out vec2 TextureCoord[];
+out vec3 Normal[];
 
 void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
     TextureCoord[gl_InvocationID] = texCoord[gl_InvocationID];
+    Normal[gl_InvocationID] = normal[gl_InvocationID];
 
     if (gl_InvocationID == 0) {
         // ----------------------------------------------------------------------

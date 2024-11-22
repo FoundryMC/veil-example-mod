@@ -31,6 +31,16 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
     }
 
     @Override
+    public boolean shouldRenderOffScreen(MapBlockEntity blockEntity) {
+        return true;
+    }
+
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    @Override
     public void render(MapBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource source, int light, int overlay) {
         RenderType renderType = VeilExampleRenderTypes.heightmap(VeilExampleModEditor.useTessellation());
         if (renderType == null) {

@@ -15,7 +15,7 @@ public class VeilExampleModEditor extends SingleWindowEditor {
     private static final int[] maxTessLevel = new int[]{12};
     private static final int[] minDistance = new int[]{1};
     private static final int[] maxDistance = new int[]{4};
-    private static final float[] scale = new float[]{1, 1, 1};
+    private static final float[] scale = new float[]{1, 0.25F, 1};
     private static final ImBoolean useTessellation = new ImBoolean(true);
     private static final ImBoolean tessellationWireframe = new ImBoolean(false);
 
