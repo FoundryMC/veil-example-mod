@@ -42,6 +42,11 @@ public class MirrorBlock extends Block implements EntityBlock, SimpleWaterlogged
     }
 
     @Override
+    protected FluidState getFluidState(BlockState blockState) {
+        return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
+    }
+
+    @Override
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
         BlockPos blockPos = blockPlaceContext.getClickedPos();
         FluidState fluidState = blockPlaceContext.getLevel().getFluidState(blockPos);
