@@ -54,15 +54,16 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
 
         shader.applyRenderSystem();
         shader.setMatrix("ModelViewMat", modelViewStack);
+        shader.setVector("Scale", VeilExampleModEditor.getScale());
         shader.setup();
         if (VeilExampleModEditor.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL11C.GL_LINE);
         }
+
         glEnable(GL32C.GL_DEPTH_CLAMP);
-        RenderSystem.activeTexture(GL_TEXTURE0);
-        RenderSystem.bindTexture(Minecraft.getInstance().getMainRenderTarget().getColorTextureId());
         this.vbo.draw();
         glDisable(GL32C.GL_DEPTH_CLAMP);
+
         if (VeilExampleModEditor.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }

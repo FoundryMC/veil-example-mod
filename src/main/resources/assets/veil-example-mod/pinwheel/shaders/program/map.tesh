@@ -4,6 +4,7 @@ uniform mat4 ModelViewMat;
 uniform mat4 RenderProjMat;
 
 uniform sampler2D Sampler0;
+uniform vec3 Scale;
 
 in vec2 TextureCoord[];
 
@@ -28,7 +29,7 @@ void main()
     vec2 texCoord = (t1 - t0) * v + t0;
 
     // lookup texel at patch coordinate for height and scale + shift as desired
-    float height = texture(Sampler0, texCoord).y;
+    float height = Scale.y * texture(Sampler0, texCoord).y;
     fragTexCoord = texCoord;
 
     // ----------------------------------------------------------------------

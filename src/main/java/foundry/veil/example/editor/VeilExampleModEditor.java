@@ -6,16 +6,16 @@ import foundry.veil.api.client.render.shader.definition.ShaderPreDefinitions;
 import imgui.ImGui;
 import imgui.type.ImBoolean;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
 
 public class VeilExampleModEditor extends SingleWindowEditor {
 
     public static final Component TITLE = Component.translatable("editor.veil-example-mod.editor.title");
 
     private static final int[] minTessLevel = new int[]{4};
-    private static final int[] maxTessLevel = new int[]{64};
+    private static final int[] maxTessLevel = new int[]{12};
     private static final int[] minDistance = new int[]{1};
-    private static final int[] maxDistance = new int[]{6};
+    private static final int[] maxDistance = new int[]{4};
+    private static final float[] scale = new float[]{1, 1, 1};
     private static final ImBoolean useTessellation = new ImBoolean(true);
     private static final ImBoolean tessellationWireframe = new ImBoolean(false);
 
@@ -42,17 +42,10 @@ public class VeilExampleModEditor extends SingleWindowEditor {
                         if (ImGui.dragInt("Max Distance", maxDistance, 1, minDistance[0], Integer.MAX_VALUE)) {
                             definitions.define("MAX_DISTANCE", String.valueOf(maxDistance[0]));
                         }
+                        ImGui.dragFloat3("Scale", scale, 0.0625F, 0, Float.MAX_VALUE);
                     }
                 }
                 ImGui.endTabItem();
-
-                if (value.tooltip != null && ImGui.isItemHovered()) {
-                    ImGui.beginTooltip();
-                    ImGui.pushTextWrapPos(ImGui.getFontSize() * 35.0f);
-                    ImGui.textUnformatted(value.tooltip);
-                    ImGui.popTextWrapPos();
-                    ImGui.endTooltip();
-                }
             }
 
             ImGui.endTabBar();
@@ -88,15 +81,17 @@ public class VeilExampleModEditor extends SingleWindowEditor {
         return maxDistance[0];
     }
 
+    public static float[] getScale() {
+        return scale;
+    }
+
     private enum Example {
-        TESSELLATION("Tessellation", "");
+        TESSELLATION("Tessellation");
 
         private final String name;
-        private final String tooltip;
 
-        Example(String name, @Nullable String tooltip) {
+        Example(String name) {
             this.name = name;
-            this.tooltip = tooltip;
         }
     }
 }

@@ -17,6 +17,10 @@
       "name": "veil-example-mod:map"
     },
     {
+      "type": "minecraft:transparency",
+      "mode": "translucent"
+    },
+    {
       "type": "minecraft:lightmap"
     },
     {
