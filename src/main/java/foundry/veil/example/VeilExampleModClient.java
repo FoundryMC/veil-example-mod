@@ -1,10 +1,8 @@
 package foundry.veil.example;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
-import foundry.veil.api.client.render.framebuffer.AdvancedFboAttachment;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.api.client.render.texture.DynamicCubemapTexture;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
@@ -12,13 +10,16 @@ import foundry.veil.example.blockentity.MapBlockEntity;
 import foundry.veil.example.client.render.MapBlockEntityRenderer;
 import foundry.veil.example.client.render.MirrorBlockEntityRenderer;
 import foundry.veil.example.client.render.SimpleBlockItemRenderer;
-import foundry.veil.example.editor.VeilExampleModEditor;
+import foundry.veil.example.client.render.entity.TestEntityRenderer;
+import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleBlocks;
+import foundry.veil.example.registry.VeilExampleEntities;
 import foundry.veil.fabric.event.FabricVeilRenderLevelStageEvent;
-import foundry.veil.fabric.event.FabricVeilRendererEvent;
+import foundry.veil.fabric.event.FabricVeilRendererAvailableEvent;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -35,7 +36,8 @@ public class VeilExampleModClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(VeilExampleBlocks.MAP, new SimpleBlockItemRenderer(new MapBlockEntity(BlockPos.ZERO, VeilExampleBlocks.MAP.defaultBlockState())));
         BlockEntityRenderers.register(VeilExampleBlocks.MAP_BE, MapBlockEntityRenderer::new);
         BlockEntityRenderers.register(VeilExampleBlocks.MIRROR_BE, MirrorBlockEntityRenderer::new);
-        FabricVeilRendererEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModEditor()));
+        EntityRendererRegistry.register(VeilExampleEntities.TEST, TestEntityRenderer::new);
+        FabricVeilRendererAvailableEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModInspector()));
 
         FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
@@ -44,7 +46,7 @@ public class VeilExampleModClient implements ClientModInitializer {
         });
 
         // Make sure there's no crash
-        FabricVeilRendererEvent.EVENT.register(renderer -> {
+        FabricVeilRendererAvailableEvent.EVENT.register(renderer -> {
             DynamicCubemapTexture cubemap = new DynamicCubemapTexture();
             for (Direction value : Direction.values()) {
                 try (NativeImage image = genTest(64, 64)) {

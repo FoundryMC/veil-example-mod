@@ -2,7 +2,8 @@ package foundry.veil.example.registry;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import foundry.veil.api.client.registry.RenderTypeStageRegistry;
+import foundry.veil.api.client.registry.RenderTypeLayerRegistry;
+import foundry.veil.api.client.registry.RenderTypeShardRegistry;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.example.VeilExampleMod;
@@ -38,7 +39,7 @@ public final class VeilExampleRenderTypes extends RenderType {
                 true,
                 false,
                 compositeState);
-        RenderTypeStageRegistry.addStage(rendertype, VeilRenderBridge.patchState(4));
+        RenderTypeShardRegistry.addShard(rendertype, VeilRenderBridge.patchState(4));
         return rendertype;
     }));
 

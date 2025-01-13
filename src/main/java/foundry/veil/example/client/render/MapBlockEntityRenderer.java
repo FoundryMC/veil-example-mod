@@ -5,9 +5,8 @@ import com.mojang.blaze3d.vertex.*;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.example.blockentity.MapBlockEntity;
-import foundry.veil.example.editor.VeilExampleModEditor;
+import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleRenderTypes;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -17,7 +16,6 @@ import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL32C;
 
 import static org.lwjgl.opengl.GL11C.*;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntity> {
 
@@ -42,7 +40,7 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
 
     @Override
     public void render(MapBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource source, int light, int overlay) {
-        RenderType renderType = VeilExampleRenderTypes.heightmap(VeilExampleModEditor.useTessellation());
+        RenderType renderType = VeilExampleRenderTypes.heightmap(VeilExampleModInspector.useTessellation());
         if (renderType == null) {
             return;
         }
@@ -62,19 +60,17 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         this.vbo.bind();
         this.vbo.upload(render(20));
 
-        shader.applyRenderSystem();
-        shader.setMatrix("ModelViewMat", modelViewStack);
-        shader.setVector("Scale", VeilExampleModEditor.getScale());
-        shader.setup();
-        if (VeilExampleModEditor.tessellationWireframe()) {
+        shader.bind();
+        shader.setVector("Scale", VeilExampleModInspector.getScale());
+        if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL11C.GL_LINE);
         }
 
         glEnable(GL32C.GL_DEPTH_CLAMP);
-        this.vbo.draw();
+        this.vbo.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
         glDisable(GL32C.GL_DEPTH_CLAMP);
 
-        if (VeilExampleModEditor.tessellationWireframe()) {
+        if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         renderType.clearRenderState();

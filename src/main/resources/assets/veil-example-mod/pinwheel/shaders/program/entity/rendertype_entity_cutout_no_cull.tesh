@@ -1,10 +1,14 @@
 #include veil:light
+#include veil:fog
 
 layout (quads, fractional_odd_spacing, ccw) in;
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform sampler2D HeightMap;
+
+uniform mat3 NormalMat;
+uniform int FogShape;
 
 uniform vec3 Light0_Direction;
 uniform vec3 Light1_Direction;
@@ -42,19 +46,19 @@ void main()
     float u1 = 1.0 - gl_TessCoord.x;
     float v = gl_TessCoord.y;
 
-    // ----------------------------------------------------------------------
-    // bilinearly interpolate texture coordinate across patch
-    vertexDistance = mix(mix(VertexDistance[0], VertexDistance[1], u0), mix(VertexDistance[2], VertexDistance[3], u1), v);
-    vertexColor = mix(mix(VertexColor[0], VertexColor[1], u0), mix(VertexColor[2], VertexColor[3], u1), v);
-    lightMapColor = mix(mix(LightMapColor[0], LightMapColor[1], u0), mix(LightMapColor[2], LightMapColor[3], u1), v);
-    overlayColor = mix(mix(OverlayColor[0], OverlayColor[1], u0), mix(OverlayColor[2], OverlayColor[3], u1), v);
-    texCoord0 = mix(mix(TexCoord0[0], TexCoord0[1], u0), mix(TexCoord0[2], TexCoord0[3], u1), v);
-
     vec4 uVec = gl_in[1].gl_Position - gl_in[0].gl_Position;
     vec4 vVec = gl_in[2].gl_Position - gl_in[0].gl_Position;
     vec4 realNormal = normalize(vec4(cross(uVec.xyz, vVec.xyz), 0));
 
     vec4 pos = getHeightMapPosition(realNormal, u0, v);
+
+    // ----------------------------------------------------------------------
+    // bilinearly interpolate texture coordinate across patch
+    vertexDistance = fog_distance(pos.xyz, FogShape);
+    vertexColor = mix(mix(VertexColor[0], VertexColor[1], u0), mix(VertexColor[2], VertexColor[3], u1), v);
+    lightMapColor = mix(mix(LightMapColor[0], LightMapColor[1], u0), mix(LightMapColor[2], LightMapColor[3], u1), v);
+    overlayColor = mix(mix(OverlayColor[0], OverlayColor[1], u0), mix(OverlayColor[2], OverlayColor[3], u1), v);
+    texCoord0 = mix(mix(TexCoord0[0], TexCoord0[1], u0), mix(TexCoord0[2], TexCoord0[3], u1), v);
 
     vec4 normalUVec = getHeightMapPosition(realNormal, u0 - 0.01, v) - pos;
     vec4 normalVVec = getHeightMapPosition(realNormal, u0, v - 0.01) - pos;

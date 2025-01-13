@@ -1,15 +1,15 @@
 package foundry.veil.example.editor;
 
-import foundry.veil.api.client.editor.SingleWindowEditor;
+import foundry.veil.api.client.editor.SingleWindowInspector;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.definition.ShaderPreDefinitions;
 import imgui.ImGui;
 import imgui.type.ImBoolean;
 import net.minecraft.network.chat.Component;
 
-public class VeilExampleModEditor extends SingleWindowEditor {
+public class VeilExampleModInspector extends SingleWindowInspector {
 
-    public static final Component TITLE = Component.translatable("editor.veil-example-mod.editor.title");
+    public static final Component TITLE = Component.translatable("editor.veil-example-mod.inspector.title");
 
     private static final int[] minTessLevel = new int[]{4};
     private static final int[] maxTessLevel = new int[]{12};
@@ -18,6 +18,7 @@ public class VeilExampleModEditor extends SingleWindowEditor {
     private static final float[] scale = new float[]{1, 0.25F, 1};
     private static final ImBoolean useTessellation = new ImBoolean(true);
     private static final ImBoolean tessellationWireframe = new ImBoolean(false);
+    private static final ImBoolean tessellateEntities = new ImBoolean(true);
 
     @Override
     protected void renderComponents() {
@@ -29,18 +30,20 @@ public class VeilExampleModEditor extends SingleWindowEditor {
                     if (value == Example.TESSELLATION) {
                         ImGui.checkbox("Use Tessellation", useTessellation);
                         ImGui.sameLine();
+                        ImGui.checkbox("Use Entity Tessellation", tessellateEntities);
+                        ImGui.sameLine();
                         ImGui.checkbox("Wireframe", tessellationWireframe);
                         if (ImGui.dragInt("Min Tessellation Level", minTessLevel, 1, 1, Integer.MAX_VALUE)) {
-                            definitions.define("MIN_TESS_LEVEL", String.valueOf(minTessLevel[0]));
+                            definitions.set("MIN_TESS_LEVEL", String.valueOf(minTessLevel[0]));
                         }
                         if (ImGui.dragInt("Max Tessellation Level", maxTessLevel, 1, minTessLevel[0], Integer.MAX_VALUE)) {
-                            definitions.define("MAX_TESS_LEVEL", String.valueOf(maxTessLevel[0]));
+                            definitions.set("MAX_TESS_LEVEL", String.valueOf(maxTessLevel[0]));
                         }
                         if (ImGui.dragInt("Min Distance", minDistance, 1, 0, Integer.MAX_VALUE)) {
-                            definitions.define("MIN_DISTANCE", String.valueOf(minDistance[0]));
+                            definitions.set("MIN_DISTANCE", String.valueOf(minDistance[0]));
                         }
                         if (ImGui.dragInt("Max Distance", maxDistance, 1, minDistance[0], Integer.MAX_VALUE)) {
-                            definitions.define("MAX_DISTANCE", String.valueOf(maxDistance[0]));
+                            definitions.set("MAX_DISTANCE", String.valueOf(maxDistance[0]));
                         }
                         ImGui.dragFloat3("Scale", scale, 0.0625F, 0, Float.MAX_VALUE);
                     }
@@ -59,6 +62,10 @@ public class VeilExampleModEditor extends SingleWindowEditor {
 
     public static boolean useTessellation() {
         return useTessellation.get();
+    }
+
+    public static boolean tessellateEntities() {
+        return tessellateEntities.get();
     }
 
     public static boolean tessellationWireframe() {

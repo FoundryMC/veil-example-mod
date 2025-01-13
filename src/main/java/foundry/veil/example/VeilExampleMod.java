@@ -1,6 +1,7 @@
 package foundry.veil.example;
 
 import foundry.veil.example.registry.VeilExampleBlocks;
+import foundry.veil.example.registry.VeilExampleEntities;
 import foundry.veil.example.registry.VeilExampleItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -30,6 +31,7 @@ public class VeilExampleMod implements ModInitializer {
     public void onInitialize() {
         VeilExampleItems.bootstrap();
         VeilExampleBlocks.bootstrap();
+        VeilExampleEntities.bootstrap();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP, FabricItemGroup.builder().title(Component.translatable(MODID + ".items")).icon(() -> new ItemStack(VeilExampleBlocks.MAP)).displayItems(VeilExampleItems::fillTab).build());
     }
 }

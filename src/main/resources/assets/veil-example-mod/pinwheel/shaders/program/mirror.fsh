@@ -15,6 +15,7 @@ in vec2 texCoord0;
 out vec4 fragColor;
 
 void main() {
-    vec4 color = texture(Sampler0, vec2(1.0 - gl_FragCoord.x / ScreenSize.x, gl_FragCoord.y / ScreenSize.y)) * vertexColor * ColorModulator;
+    vec2 uv = vec2(1.0 - gl_FragCoord.x, gl_FragCoord.y) / ScreenSize.xy;
+    vec4 color = texture(Sampler0, uv) * vertexColor * ColorModulator;
     fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
 }

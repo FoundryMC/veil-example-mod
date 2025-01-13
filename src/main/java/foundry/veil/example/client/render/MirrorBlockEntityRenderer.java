@@ -127,7 +127,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
             return false;
         }
 
-        CullFrustum frustum = VeilRenderer.getCullingFrustum();
+        CullFrustum frustum = VeilRenderSystem.getCullingFrustum();
         Direction facing = blockEntity.getBlockState().getValue(MirrorBlock.FACING);
         Vec3i normal = facing.getNormal();
         if (dot(pos, normal, vec3.x, vec3.y, vec3.z) >= 0) {

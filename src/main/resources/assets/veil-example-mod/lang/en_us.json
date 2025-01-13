@@ -2,5 +2,5 @@
   "veil-example-mod.items": "Veil Example",
   "block.veil-example-mod.map": "Tesselation Map Example",
   "block.veil-example-mod.mirror": "Mirror Example",
-  "editor.veil-example-mod.editor.title": "Veil Example Mod"
+  "editor.veil-example-mod.inspector.title": "Veil Example Mod"
 }
