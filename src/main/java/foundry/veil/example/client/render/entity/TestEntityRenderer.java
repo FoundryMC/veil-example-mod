@@ -10,9 +10,17 @@ import foundry.veil.api.client.render.MatrixStack;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.example.VeilExampleMod;
 import foundry.veil.example.entity.TestEntity;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, TestEntitySkeleton> {
 
@@ -20,6 +28,8 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
     private static final Skin TEST_SKIN = createSkin();
     private static final ResourceLocation RENDERTYPE = VeilExampleMod.path("test_entity");
     private static final ResourceLocation TEXTURE_LOCATION = VeilExampleMod.path("textures/entity/test.png");
+
+    private final ModelPart test;
 
     public TestEntityRenderer(EntityRendererProvider.Context context) {
         super(context, 1.0F);
@@ -34,24 +44,31 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
                 return TEST_SKIN;
             }
         });
+        this.test = new ModelPart(List.of(new ModelPart.Cube(0, 0, 0, 0, 0, 4, 8, 4, 0, 0, 0, false, 16, 16, EnumSet.allOf(Direction.class))), Collections.emptyMap());
     }
 
     @Override
-    public void render(TestEntity testEntity, NecromancerRenderer context, MatrixStack matrixStack, float partialTicks) {
+    public void render(TestEntity testEntity, NecromancerRenderer context, MatrixStack matrixStack, int packedLight, float partialTicks) {
         for (Bone bone : SKELETON.bones.values()) {
             bone.reset();
-            bone.color.set(1, 0, 1, 1);
-            bone.x = -4;
+            bone.color.set(1, 1, 1, 1);
+//            bone.position.x = -4;
+//            bone.position.z = -5;
+//            bone.rotation.z = (float) (-Math.PI / 2);
         }
-        super.render(testEntity, context, matrixStack, 1.0F);
+        matrixStack.matrixPush();
+        matrixStack.applyScale(-1.0F, -1.0F, 1.0F);
+        matrixStack.translate(0.0F, -1.501F, 0.0F);
+        this.test.render(matrixStack.toPoseStack(), context.getBuffer(RenderType.entityCutout(TEXTURE_LOCATION)), packedLight, OverlayTexture.NO_OVERLAY);
+        matrixStack.matrixPop();
+        super.render(testEntity, context, matrixStack, packedLight, 1.0F);
     }
 
     private static Skin createSkin() {
-        Skin.Builder builder = Skin.builder(64, 64);
+        Skin.Builder builder = Skin.builder(16, 16);
 
         builder.startBone("test");
-        builder.addCube(4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, false);
-        builder.endBone();
+        builder.addCube(4, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, false);
 
         return builder.build();
     }
