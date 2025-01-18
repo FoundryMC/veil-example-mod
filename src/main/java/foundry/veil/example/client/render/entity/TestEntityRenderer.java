@@ -11,7 +11,6 @@ import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.example.VeilExampleMod;
 import foundry.veil.example.entity.TestEntity;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -24,7 +23,6 @@ import java.util.List;
 
 public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, TestEntitySkeleton> {
 
-    private static final TestEntitySkeleton SKELETON = new TestEntitySkeleton();
     private static final Skin TEST_SKIN = createSkin();
     private static final ResourceLocation RENDERTYPE = VeilExampleMod.path("test_entity");
     private static final ResourceLocation TEXTURE_LOCATION = VeilExampleMod.path("textures/entity/test.png");
@@ -49,12 +47,17 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
 
     @Override
     public void render(TestEntity testEntity, NecromancerRenderer context, MatrixStack matrixStack, int packedLight, float partialTicks) {
-        for (Bone bone : SKELETON.bones.values()) {
-            bone.reset();
-            bone.color.set(1, 1, 1, 1);
-//            bone.position.x = -4;
-//            bone.position.z = -5;
-//            bone.rotation.z = (float) (-Math.PI / 2);
+        TestEntitySkeleton skeleton = testEntity.getSkeleton();
+        if (skeleton != null) {
+            for (Bone bone : skeleton.bones.values()) {
+                bone.reset();
+                bone.color.set(1, 1, 1, 1);
+
+                float time = testEntity.tickCount + partialTicks;
+                bone.position.y = (float) Math.sin(time * 45 * Math.PI / 180.0);
+                float rot = (float) (time * 8 * Math.PI / 180.0);
+                bone.rotation.rotateXYZ(rot, rot, rot);
+            }
         }
         matrixStack.matrixPush();
         matrixStack.applyScale(-1.0F, -1.0F, 1.0F);
@@ -75,7 +78,7 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
 
     @Override
     public TestEntitySkeleton createSkeleton(TestEntity entity) {
-        return SKELETON;
+        return new TestEntitySkeleton();
     }
 
     @Override
