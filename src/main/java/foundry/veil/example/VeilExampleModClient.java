@@ -11,6 +11,7 @@ import foundry.veil.example.client.render.MapBlockEntityRenderer;
 import foundry.veil.example.client.render.MirrorBlockEntityRenderer;
 import foundry.veil.example.client.render.SimpleBlockItemRenderer;
 import foundry.veil.example.client.render.entity.TestEntityRenderer;
+import foundry.veil.example.client.render.entity.mogul.MogulRenderer;
 import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.example.registry.VeilExampleEntities;
@@ -37,6 +38,7 @@ public class VeilExampleModClient implements ClientModInitializer {
         BlockEntityRenderers.register(VeilExampleBlocks.MAP_BE, MapBlockEntityRenderer::new);
         BlockEntityRenderers.register(VeilExampleBlocks.MIRROR_BE, MirrorBlockEntityRenderer::new);
         EntityRendererRegistry.register(VeilExampleEntities.TEST, TestEntityRenderer::new);
+        EntityRendererRegistry.register(VeilExampleEntities.MOGUL, MogulRenderer::new);
         FabricVeilRendererAvailableEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModInspector()));
 
         FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
