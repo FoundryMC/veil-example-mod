@@ -14,9 +14,17 @@ public class TestEntity extends Entity implements SkeletonParent<TestEntity, Tes
 
     private TestEntitySkeleton skeleton;
     private Animator<TestEntity, TestEntitySkeleton> animator;
+    private int animationTicks;
 
     public TestEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
+        this.animationTicks = level.random.nextInt(100);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.animationTicks++;
     }
 
     @Override
@@ -52,5 +60,9 @@ public class TestEntity extends Entity implements SkeletonParent<TestEntity, Tes
     @Override
     public @Nullable Animator<TestEntity, TestEntitySkeleton> getAnimator() {
         return this.animator;
+    }
+
+    public int getAnimationTicks() {
+        return this.animationTicks;
     }
 }

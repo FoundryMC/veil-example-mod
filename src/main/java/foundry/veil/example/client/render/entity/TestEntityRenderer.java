@@ -10,6 +10,7 @@ import foundry.veil.api.client.render.MatrixStack;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.example.VeilExampleMod;
 import foundry.veil.example.entity.TestEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -30,7 +31,7 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
     private final ModelPart test;
 
     public TestEntityRenderer(EntityRendererProvider.Context context) {
-        super(context, 1.0F);
+        super(context, 0.0F);
         this.addLayer(new NecromancerSkinEntityRenderLayer<>(this) {
             @Override
             public RenderType getRenderType(TestEntity entity) {
@@ -47,24 +48,35 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
 
     @Override
     public void render(TestEntity testEntity, NecromancerRenderer context, MatrixStack matrixStack, int packedLight, float partialTicks) {
-        TestEntitySkeleton skeleton = testEntity.getSkeleton();
-        if (skeleton != null) {
-            for (Bone bone : skeleton.bones.values()) {
-                bone.reset();
-                bone.color.set(1, 1, 1, 1);
+        float time = testEntity.getAnimationTicks() + partialTicks;
+        float rot = (float) (time * 8 * Math.PI / 180.0);
+        boolean vanilla = false;//Minecraft.getInstance().player.isCrouching();
 
-                float time = testEntity.tickCount + partialTicks;
-                bone.position.y = (float) Math.sin(time * 45 * Math.PI / 180.0);
-                float rot = (float) (time * 8 * Math.PI / 180.0);
-                bone.rotation.rotateXYZ(rot, rot, rot);
+        if (vanilla) {
+            matrixStack.matrixPush();
+            matrixStack.applyScale(-1.0F, -1.0F, 1.0F);
+            matrixStack.translate(0.0F, -1.501F, 0.0F);
+
+            this.test.y = (float) Math.sin(time * 45 * Math.PI / 180.0);
+            this.test.xRot = rot;
+            this.test.yRot = rot;
+            this.test.zRot = rot;
+
+            this.test.render(matrixStack.toPoseStack(), context.getBuffer(RenderType.entityCutout(TEXTURE_LOCATION)), packedLight, OverlayTexture.NO_OVERLAY);
+            matrixStack.matrixPop();
+        } else {
+            TestEntitySkeleton skeleton = testEntity.getSkeleton();
+            if (skeleton != null) {
+                for (Bone bone : skeleton.bones.values()) {
+                    bone.reset();
+
+                    bone.position.y = (float) Math.sin(time * 45 * Math.PI / 180.0);
+                    bone.rotation.rotateXYZ(rot, rot, rot);
+                }
             }
+
+            super.render(testEntity, context, matrixStack, packedLight, 1.0F);
         }
-        matrixStack.matrixPush();
-        matrixStack.applyScale(-1.0F, -1.0F, 1.0F);
-        matrixStack.translate(0.0F, -1.501F, 0.0F);
-        this.test.render(matrixStack.toPoseStack(), context.getBuffer(RenderType.entityCutout(TEXTURE_LOCATION)), packedLight, OverlayTexture.NO_OVERLAY);
-        matrixStack.matrixPop();
-        super.render(testEntity, context, matrixStack, packedLight, 1.0F);
     }
 
     private static Skin createSkin() {
