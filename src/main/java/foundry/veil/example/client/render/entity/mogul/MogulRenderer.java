@@ -7,7 +7,6 @@ import foundry.veil.api.client.necromancer.render.Skin;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.example.VeilExampleMod;
 import foundry.veil.example.entity.MogulEntity;
-import foundry.veil.example.entity.TestEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -15,13 +14,14 @@ import net.minecraft.resources.ResourceLocation;
 public class MogulRenderer extends NecromancerEntityRenderer<MogulEntity, MogulSkeleton> {
     private static final ResourceLocation RENDERTYPE = VeilExampleMod.path("mogul_entity");
     private static final ResourceLocation TEXTURE_LOCATION = VeilExampleMod.path("textures/entity/mogul.png");
+    private static final ResourceLocation ROBE_TEXTURE_LOCATION = VeilExampleMod.path("textures/entity/mogul_robes.png");
 
     public MogulRenderer(EntityRendererProvider.Context context) {
         super(context, 1.5F);
         this.addLayer(new NecromancerSkinEntityRenderLayer<>(this) {
             @Override
             public RenderType getRenderType(MogulEntity entity) {
-                return VeilRenderType.get(RENDERTYPE, TEXTURE_LOCATION);
+                return VeilRenderType.get(RENDERTYPE, TEXTURE_LOCATION, ROBE_TEXTURE_LOCATION);
             }
             @Override
             public Skin getSkin(MogulEntity parent) {
