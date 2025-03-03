@@ -1,4 +1,4 @@
-#include veil:camera
+#veil:buffer veil:camera VeilCamera
 
 layout (vertices=4) out;
 

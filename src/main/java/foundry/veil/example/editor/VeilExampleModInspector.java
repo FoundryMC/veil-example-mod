@@ -2,7 +2,7 @@ package foundry.veil.example.editor;
 
 import foundry.veil.api.client.editor.SingleWindowInspector;
 import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.shader.definition.ShaderPreDefinitions;
+import foundry.veil.api.client.render.shader.ShaderPreDefinitions;
 import imgui.ImGui;
 import imgui.type.ImBoolean;
 import net.minecraft.network.chat.Component;

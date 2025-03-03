@@ -17,6 +17,7 @@ import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.example.registry.VeilExampleEntities;
 import foundry.veil.fabric.event.FabricVeilRenderLevelStageEvent;
 import foundry.veil.fabric.event.FabricVeilRendererAvailableEvent;
+import foundry.veil.platform.VeilEventPlatform;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -41,6 +42,7 @@ public class VeilExampleModClient implements ClientModInitializer {
         EntityRendererRegistry.register(VeilExampleEntities.MOGUL, MogulRenderer::new);
         FabricVeilRendererAvailableEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModInspector()));
 
+        // Equivalent cross-platform method: VeilEventPlatform.INSTANCE.onVeilRenderLevelStage();
         FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
                 MirrorBlockEntityRenderer.renderLevel(Minecraft.getInstance().level, projectionMatrix, deltaTracker, VeilRenderBridge.create(frustum), camera);
