@@ -194,7 +194,7 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
 
             calculateObliqueMatrix(RENDER_PROJECTION, plane, RENDER_PROJECTION);
 
-            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION, renderPos, VIEW.identity().lookAlong(dir, up), RENDER_DISTANCE, deltaTracker);
+            VeilLevelPerspectiveRenderer.render(fbo, RENDER_MODELVIEW, RENDER_PROJECTION, renderPos, VIEW.identity().lookAlong(dir, up), RENDER_DISTANCE, deltaTracker, false);
             mirror.copy(fbo);
             mirror.setRendered(true);
         }

@@ -84,6 +84,7 @@ public class TestEntityRenderer extends NecromancerEntityRenderer<TestEntity, Te
 
         builder.startBone("test");
         builder.addCube(4, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, false);
+        builder.addCube(4, 8, 4, 4, 0, 0, 0, 0, 0, 0, 0, true);
 
         return builder.build();
     }

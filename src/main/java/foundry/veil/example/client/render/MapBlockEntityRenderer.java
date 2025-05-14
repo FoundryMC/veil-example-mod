@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import foundry.veil.example.blockentity.MapBlockEntity;
 import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleRenderTypes;
@@ -61,7 +62,10 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         this.vbo.upload(render(20));
 
         shader.bind();
-        shader.setVector("Scale", VeilExampleModInspector.getScale());
+        ShaderUniform scale = shader.getUniform("Scale");
+        if (scale != null) {
+            scale.setVector(VeilExampleModInspector.getScale());
+        }
         if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL11C.GL_LINE);
         }
