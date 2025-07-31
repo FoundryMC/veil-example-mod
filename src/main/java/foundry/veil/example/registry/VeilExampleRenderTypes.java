@@ -2,7 +2,6 @@ package foundry.veil.example.registry;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import foundry.veil.api.client.registry.RenderTypeLayerRegistry;
 import foundry.veil.api.client.registry.RenderTypeShardRegistry;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
