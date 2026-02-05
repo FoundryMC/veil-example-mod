@@ -3,12 +3,15 @@ package foundry.veil.example.client.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
+import foundry.veil.api.client.render.vertex.VertexArray;
 import foundry.veil.example.blockentity.MapBlockEntity;
 import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -20,13 +23,12 @@ import static org.lwjgl.opengl.GL11C.*;
 
 public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntity> {
 
-    private final VertexBuffer vbo;
+    private final VertexArray vao;
 
     public MapBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        this.vbo = new VertexBuffer(VertexBuffer.Usage.STATIC);
-        this.vbo.bind();
-        this.vbo.upload(render(20));
-        VertexBuffer.unbind();
+        this.vao = VertexArray.create();
+        this.vao.upload(render(20), VertexArray.DrawUsage.STATIC);
+        VertexArray.unbind();
     }
 
     @Override
@@ -46,10 +48,12 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
             return;
         }
 
-        renderType.setupRenderState();
+        RenderStateShard.ShaderStateShard shard = VeilRenderType.getShards(renderType).shaderState();
+        shard.setupRenderState();
+
         ShaderProgram shader = VeilRenderSystem.getShader();
         if (shader == null) {
-            renderType.clearRenderState();
+            shard.clearRenderState();
             return;
         }
 
@@ -58,10 +62,8 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         modelViewStack.mul(poseStack.last().pose());
 //        modelViewStack.scale(25, 20, 25);
 
-        this.vbo.bind();
-        this.vbo.upload(render(20));
+        this.vao.bind();
 
-        shader.bind();
         ShaderUniform scale = shader.getUniform("Scale");
         if (scale != null) {
             scale.setVector(VeilExampleModInspector.getScale());
@@ -71,13 +73,12 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         }
 
         glEnable(GL32C.GL_DEPTH_CLAMP);
-        this.vbo.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+        this.vao.drawWithRenderType(renderType);
         glDisable(GL32C.GL_DEPTH_CLAMP);
 
         if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        renderType.clearRenderState();
 
         VertexBuffer.unbind();
 
