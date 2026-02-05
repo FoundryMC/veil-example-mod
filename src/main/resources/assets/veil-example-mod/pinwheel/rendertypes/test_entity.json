@@ -6,21 +6,47 @@
   "affectsCrumbling": true,
   "outline": false,
   "layers": [
-    {
-      "type": "minecraft:texture",
-      "texture": "%1$s",
-      "blur": false,
-      "mipmap": false
-    },
-    {
-      "type": "veil:shader",
-      "name": "veil:necromancer/skinned_mesh"
-    },
-    {
-      "type": "minecraft:lightmap"
-    },
-    {
-      "type": "minecraft:overlay"
-    }
+    [
+      {
+        "type": "minecraft:texture",
+        "texture": "%1$s",
+        "blur": false,
+        "mipmap": false
+      },
+      {
+        "type": "veil:shader",
+        "name": "veil:necromancer/skinned_mesh"
+      },
+      {
+        "type": "minecraft:lightmap"
+      },
+      {
+        "type": "minecraft:overlay"
+      }
+    ],
+    [
+      {
+        "type": "minecraft:texture",
+        "texture": "%1$s",
+        "blur": false,
+        "mipmap": false
+      },
+      {
+        "type": "veil:shader",
+        "name": "veil-example-mod:necromancer/entity_bloom"
+      },
+      {
+        "type": "minecraft:output",
+        "framebuffer": "veil:bloom"
+      },
+      {
+        "type": "minecraft:write_mask",
+        "depth": false
+      },
+      {
+        "type": "minecraft:depth_test",
+        "mode": "equal"
+      }
+    ]
   ]
 }

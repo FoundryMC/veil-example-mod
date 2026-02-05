@@ -1,0 +1,9 @@
+{
+  "vertex": "veil:necromancer/skinned_mesh",
+  "fragment": "veil-example-mod:necromancer/entity_bloom",
+  "definitions": [
+    {
+      "NECROMANCER_BONE_BUFFER_SIZE": 256
+    }
+  ]
+}
