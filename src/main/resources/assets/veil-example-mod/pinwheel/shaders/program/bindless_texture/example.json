@@ -1,0 +1,7 @@
+{
+  "vertex": "veil-example-mod:bindless_texture/example",
+  "fragment": "veil-example-mod:bindless_texture/example",
+  "required_features": [
+    "BINDLESS_TEXTURE"
+  ]
+}
