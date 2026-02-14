@@ -19,6 +19,8 @@ public class VeilExampleModInspector extends SingleWindowInspector {
     private static final ImBoolean useTessellation = new ImBoolean(true);
     private static final ImBoolean tessellationWireframe = new ImBoolean(false);
     private static final ImBoolean tessellateEntities = new ImBoolean(true);
+    private static final int[] baseResolution = new int[]{20};
+    private static boolean regenerateMesh = false;
 
     @Override
     protected void renderComponents() {
@@ -44,6 +46,9 @@ public class VeilExampleModInspector extends SingleWindowInspector {
                         }
                         if (ImGui.dragInt("Max Distance", maxDistance, 1, minDistance[0], Integer.MAX_VALUE)) {
                             definitions.set("MAX_DISTANCE", String.valueOf(maxDistance[0]));
+                        }
+                        if (ImGui.dragInt("Base Mesh Resolution", baseResolution, 1, 1, 100)) {
+                            regenerateMesh = true;
                         }
                         ImGui.dragFloat3("Scale", scale, 0.0625F, 0, Float.MAX_VALUE);
                     }
@@ -72,6 +77,10 @@ public class VeilExampleModInspector extends SingleWindowInspector {
         return tessellationWireframe.get();
     }
 
+    public static boolean isRegenerateMesh() {
+        return regenerateMesh;
+    }
+
     public static int getMinTessLevel() {
         return minTessLevel[0];
     }
@@ -88,8 +97,16 @@ public class VeilExampleModInspector extends SingleWindowInspector {
         return maxDistance[0];
     }
 
+    public static int getBaseResolution() {
+        return baseResolution[0];
+    }
+
     public static float[] getScale() {
         return scale;
+    }
+
+    public static void setRegenerateMesh(boolean regenerateMesh) {
+        VeilExampleModInspector.regenerateMesh = regenerateMesh;
     }
 
     private enum Example {

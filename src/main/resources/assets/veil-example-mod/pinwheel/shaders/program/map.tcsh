@@ -1,5 +1,3 @@
-#veil:buffer veil:camera VeilCamera
-
 layout (vertices=4) out;
 
 uniform mat4 ModelViewMat;
@@ -8,12 +6,13 @@ in vec2 texCoord[];
 in vec3 normal[];
 
 out vec2 TextureCoord[];
-out vec3 Normal[];
+
+const int[4] Mapping = int[](0, 1, 3, 2);
 
 void main() {
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-    TextureCoord[gl_InvocationID] = texCoord[gl_InvocationID];
-    Normal[gl_InvocationID] = normal[gl_InvocationID];
+    int index = Mapping[gl_InvocationID % 4];
+    gl_out[gl_InvocationID].gl_Position = gl_in[index].gl_Position;
+    TextureCoord[gl_InvocationID] = texCoord[index];
 
     if (gl_InvocationID == 0) {
         // ----------------------------------------------------------------------

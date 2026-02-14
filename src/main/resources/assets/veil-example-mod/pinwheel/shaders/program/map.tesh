@@ -1,29 +1,26 @@
-layout (quads, fractional_odd_spacing, cw) in;
+layout (quads, fractional_odd_spacing, ccw) in;
 
 uniform mat4 ModelViewMat;
-uniform mat4 RenderProjMat;
+uniform mat4 ProjMat;
+uniform mat3 NormalMat;
 
 uniform sampler2D Sampler0;
 uniform vec3 Scale;
 
 in vec2 TextureCoord[];
-in vec3 Normal[];
 
 out vec2 texCoord;
 out vec3 normal;
 
 vec3 calculateNormal(float height, vec2 texCoord) {
-    const vec2 size = vec2(1.0, 0.0);
+    const vec2 size = vec2(1.0, 1.0);
     const ivec3 off = ivec3(-1, 0, 1);
 
-    float s11 = height;
-    float s01 = textureOffset(Sampler0, texCoord, off.xy).r * Scale.y;
-    float s21 = textureOffset(Sampler0, texCoord, off.zy).r * Scale.y;
-    float s10 = textureOffset(Sampler0, texCoord, off.yx).r * Scale.y;
-    float s12 = textureOffset(Sampler0, texCoord, off.yz).r * Scale.y;
-    vec3 va = vec3(size.xy, s21-s01);
-    vec3 vb = vec3(size.yx, s12-s10);
-    return normalize(cross(va, vb));
+    float left = textureOffset(Sampler0, texCoord, off.xy).r * Scale.y;
+    float right = textureOffset(Sampler0, texCoord, off.zy).r * Scale.y;
+    float down = textureOffset(Sampler0, texCoord, off.yx).r * Scale.y;
+    float up = textureOffset(Sampler0, texCoord, off.yz).r * Scale.y;
+    return normalize(vec3(left - right, 0.5, down - up));
 }
 
 void main()
@@ -56,7 +53,7 @@ void main()
     vec4 p11 = gl_in[3].gl_Position;
 
     // compute patch surface normal
-    normal = calculateNormal(height, coord);
+    normal = NormalMat * calculateNormal(height, coord);
 
     // bilinearly interpolate position coordinate across patch
     vec4 p0 = (p01 - p00) * u + p00;
@@ -68,5 +65,5 @@ void main()
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
-    gl_Position = RenderProjMat * ModelViewMat * p;
+    gl_Position = ProjMat * ModelViewMat * p;
 }

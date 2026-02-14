@@ -33,6 +33,9 @@
     {
       "type": "veil:patches",
       "patchVertices": 4
+    },
+    {
+      "type": "veil:depth_clamp"
     }
   ]
 }

@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL32C;
 
 import static org.lwjgl.opengl.GL11C.*;
 
@@ -60,21 +59,27 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushMatrix();
         modelViewStack.mul(poseStack.last().pose());
-//        modelViewStack.scale(25, 20, 25);
+        RenderSystem.applyModelViewMatrix();
 
         this.vao.bind();
+        if (VeilExampleModInspector.isRegenerateMesh()) {
+            this.vao.upload(render(VeilExampleModInspector.getBaseResolution()), VertexArray.DrawUsage.STATIC);
+            VeilExampleModInspector.setRegenerateMesh(false);
+        }
 
         ShaderUniform scale = shader.getUniform("Scale");
         if (scale != null) {
-            scale.setVector(VeilExampleModInspector.getScale());
+            if (blockEntity.isApplyScale()) {
+                scale.setVector(VeilExampleModInspector.getScale());
+            } else {
+                scale.setVector(1.0F, 0.25F, 1.0F);
+            }
         }
         if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL11C.GL_LINE);
         }
 
-        glEnable(GL32C.GL_DEPTH_CLAMP);
         this.vao.drawWithRenderType(renderType);
-        glDisable(GL32C.GL_DEPTH_CLAMP);
 
         if (VeilExampleModInspector.tessellationWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -83,25 +88,26 @@ public class MapBlockEntityRenderer implements BlockEntityRenderer<MapBlockEntit
         VertexBuffer.unbind();
 
         modelViewStack.popMatrix();
+        RenderSystem.applyModelViewMatrix();
     }
 
     private static MeshData render(int resolution) {
         Tesselator tesselator = RenderSystem.renderThreadTesselator();
         BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
-        for (int z = 0; z <= resolution - 1; z++) {
-            for (int x = 0; x <= resolution - 1; x++) {
+        for (int z = 0; z < resolution; z++) {
+            for (int x = 0; x < resolution; x++) {
                 builder.addVertex(x / (float) resolution, 0, z / (float) resolution)
                         .setUv(x / (float) resolution, z / (float) resolution);
 
                 builder.addVertex((x + 1) / (float) resolution, 0, z / (float) resolution)
                         .setUv((x + 1) / (float) resolution, z / (float) resolution);
 
-                builder.addVertex(x / (float) resolution, 0, (z + 1) / (float) resolution)
-                        .setUv(x / (float) resolution, (z + 1) / (float) resolution);
-
                 builder.addVertex((x + 1) / (float) resolution, 0, (z + 1) / (float) resolution)
                         .setUv((x + 1) / (float) resolution, (z + 1) / (float) resolution);
+
+                builder.addVertex(x / (float) resolution, 0, (z + 1) / (float) resolution)
+                        .setUv(x / (float) resolution, (z + 1) / (float) resolution);
             }
         }
 

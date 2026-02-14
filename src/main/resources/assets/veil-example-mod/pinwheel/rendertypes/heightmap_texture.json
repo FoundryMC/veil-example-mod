@@ -29,6 +29,9 @@
     {
       "type": "minecraft:cull",
       "face": "none"
+    },
+    {
+      "type": "veil:depth_clamp"
     }
   ]
 }

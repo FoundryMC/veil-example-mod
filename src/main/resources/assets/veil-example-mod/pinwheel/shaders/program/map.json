@@ -15,6 +15,9 @@
     },
     {
       "MAX_DISTANCE": 6
+    },
+    {
+      "USE_TESSELLATION": 1
     }
   ]
 }
