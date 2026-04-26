@@ -1,6 +1,7 @@
 package foundry.veil.example;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
@@ -17,10 +18,15 @@ import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.example.registry.VeilExampleEntities;
 import foundry.veil.fabric.event.FabricVeilRenderLevelStageEvent;
 import foundry.veil.fabric.event.FabricVeilRendererAvailableEvent;
+import foundry.veil.impl.VeilBuiltinPacks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -66,6 +72,13 @@ public class VeilExampleModClient implements ClientModInitializer {
                 System.out.println(test);
             }
         });
+
+        // Register test resource pack
+        ModContainer container = FabricLoader.getInstance().getModContainer(Veil.MODID).orElseThrow();
+        ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_particles"), container, ResourcePackActivationType.DEFAULT_ENABLED);
+        ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_effects"), container, ResourcePackActivationType.DEFAULT_ENABLED);
+        ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_shaders"), container, ResourcePackActivationType.DEFAULT_ENABLED);
+        ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("fog"), container, ResourcePackActivationType.DEFAULT_ENABLED);
     }
 
     private static NativeImage genTest(int width, int height) {
