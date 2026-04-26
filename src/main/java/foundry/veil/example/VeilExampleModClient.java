@@ -1,11 +1,14 @@
 package foundry.veil.example;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import foundry.imgui.fabric.api.event.ImGuiLoadEventFabric;
 import foundry.veil.Veil;
 import foundry.veil.api.client.render.VeilRenderBridge;
+import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.api.client.render.texture.DynamicCubemapTexture;
+import foundry.veil.api.event.VeilRegisterInspectorsEvent;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.example.blockentity.MapBlockEntity;
 import foundry.veil.example.client.render.MapBlockEntityRenderer;
@@ -16,9 +19,9 @@ import foundry.veil.example.client.render.entity.mogul.MogulRenderer;
 import foundry.veil.example.editor.VeilExampleModInspector;
 import foundry.veil.example.registry.VeilExampleBlocks;
 import foundry.veil.example.registry.VeilExampleEntities;
+import foundry.veil.fabric.event.FabricVeilRegisterInspectorsEvent;
 import foundry.veil.fabric.event.FabricVeilRenderLevelStageEvent;
 import foundry.veil.fabric.event.FabricVeilRendererAvailableEvent;
-import foundry.veil.impl.VeilBuiltinPacks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -44,7 +47,10 @@ public class VeilExampleModClient implements ClientModInitializer {
         BlockEntityRenderers.register(VeilExampleBlocks.MIRROR_BE, MirrorBlockEntityRenderer::new);
         EntityRendererRegistry.register(VeilExampleEntities.TEST, TestEntityRenderer::new);
         EntityRendererRegistry.register(VeilExampleEntities.MOGUL, MogulRenderer::new);
-        FabricVeilRendererAvailableEvent.EVENT.register(renderer -> renderer.getEditorManager().add(new VeilExampleModInspector()));
+
+        if (Veil.IMGUIMC) {
+            FabricVeilRegisterInspectorsEvent.EVENT.register(registry -> registry.registerInspector(new VeilExampleModInspector()));
+        }
 
         // Equivalent cross-platform method: VeilEventPlatform.INSTANCE.onVeilRenderLevelStage();
         FabricVeilRenderLevelStageEvent.EVENT.register((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, renderTick, deltaTracker, camera, frustum) -> {
@@ -74,7 +80,7 @@ public class VeilExampleModClient implements ClientModInitializer {
         });
 
         // Register test resource pack
-        ModContainer container = FabricLoader.getInstance().getModContainer(Veil.MODID).orElseThrow();
+        ModContainer container = FabricLoader.getInstance().getModContainer(VeilExampleMod.MODID).orElseThrow();
         ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_particles"), container, ResourcePackActivationType.DEFAULT_ENABLED);
         ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_effects"), container, ResourcePackActivationType.DEFAULT_ENABLED);
         ResourceManagerHelper.registerBuiltinResourcePack(Veil.veilPath("test_shaders"), container, ResourcePackActivationType.DEFAULT_ENABLED);

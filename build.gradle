@@ -11,6 +11,17 @@ base {
 
 repositories {
     mavenLocal()
+    exclusiveContent { // ImGuiMC
+        forRepository {
+            maven {
+                url = "https://maven.ryanhcode.dev/releases"
+                name = "RyanHCode Maven"
+            }
+        }
+        filter {
+            includeGroup("foundry.imguimc")
+        }
+    }
     maven {
         name = 'BlameJared Maven (CrT / Bookshelf)'
         url = 'https://maven.blamejared.com'
@@ -48,6 +59,7 @@ dependencies {
         exclude group: "maven.modrinth"
     }
     modRuntimeOnly "maven.modrinth:modmenu:11.0.3"
+    modImplementation(include("foundry.imguimc:imguimc-fabric-${project.minecraft_version}:${project.imguimc_version}"))
 
 //    modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
 }

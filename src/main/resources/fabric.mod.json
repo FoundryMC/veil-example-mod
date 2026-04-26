@@ -27,7 +27,7 @@
   "depends": {
     "fabricloader": ">=0.15.9",
     "minecraft": "~1.21",
-    "veil": ">=1.0.0",
+    "veil": ">=4.0.0",
     "java": ">=21",
     "fabric-api": "*"
   }
