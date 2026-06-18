@@ -1,0 +1,71 @@
+{
+  "max_lifetime": 200,
+  "loop": true,
+  "rate": 1,
+  "count": 1,
+  "max_particles": 1,
+  "emitter_settings": {
+    "shape": {
+      "shape": "point",
+      "dimensions": [0, 0, 0],
+      "rotation": [0, 0, 0],
+      "from_surface": false
+    },
+    "particle_settings": {
+      "particle_speed": 0.0,
+      "base_particle_size": 0.3,
+      "particle_size_variation": 0.05,
+      "particle_lifetime": 40,
+      "particle_lifetime_variation": 5,
+      "initial_direction": [0, 0, 0],
+      "random_initial_direction": false,
+      "random_initial_rotation": false,
+      "random_speed": false,
+      "random_size": true,
+      "random_lifetime": true
+    },
+    "force_spawn": false
+  },
+  "particle_data": {
+    "should_collide": false,
+    "face_velocity": false,
+    "velocity_stretch_factor": 0.0,
+    "additive": false,
+    "render_style": "billboard",
+    "init_modules": [
+      {
+        "module": "init_color",
+        "gradient": {
+          "color": [0.05, 0.05, 0.05, 0.9]
+        },
+        "interpolant": "0"
+      }
+    ],
+    "render_modules": [
+      {
+        "module": "trail",
+        "settings": [
+          {
+            "trailFrequency": 1,
+            "trailLength": 25,
+            "trailColor": [1.0, 0.0, 1.0, 0.85],
+            "trailWidthModifier": 0.4,
+            "trailPointModifier": 1.0,
+            "tilingMode": "STRETCH",
+            "billboard": true,
+            "parentRotation": false
+          }
+        ]
+      },
+      {
+        "module": "color",
+        "gradient": {
+          "color": [0.05, 0.05, 0.05, 0.9]
+        },
+        "interpolant": "q.agePercent"
+      }
+    ],
+    "update_modules": [
+    ]
+  }
+}
